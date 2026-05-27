@@ -1,0 +1,22 @@
+{
+  "budgets": [
+    {
+      "resourceType": "total",
+      "budget": 400000
+    },
+    {
+      "resourceType": "script",
+      "budget": 320000
+    },
+    {
+      "resourceType": "stylesheet",
+      "budget": 65000
+    },
+    {
+      "resourceType": "document",
+      "budget": 3000
+    }
+  ],
+  "maxBundleSize": 400000,
+  "maxVendorSize": 250000
+}

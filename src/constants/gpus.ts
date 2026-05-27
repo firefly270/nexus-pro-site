@@ -1,0 +1,49 @@
+import type { GPUCardData } from '../types'
+
+export const gpus: Record<string, GPUCardData[]> = {
+  ch01: [
+    { name: 'NV1', year: '1995', codename: 'NV1', transistors: '1M', clock: '12 MHz', cudaCores: 'N/A', memory: '2MB VRAM', highlight: "NVIDIA's first chip — quadratic texture mapping", features: ['Quadratic surface rendering', 'DirectX 1 support', '2D/3D acceleration', '220pin QFP package'], transistorScale: 0.01 },
+    { name: 'RIVA 128', year: '1997', codename: 'NV3', transistors: '3M', clock: '100 MHz', cudaCores: 'N/A', memory: '4MB SGRAM', highlight: '128-bit 2D/3D acceleration — NVIDIA\'s breakout hit', features: ['128-bit graphics pipeline', 'DirectX 5', 'AGP 2x support', '3.5M triangles/sec'], transistorScale: 0.03 },
+    { name: 'RIVA TNT', year: '1998', codename: 'NV4', transistors: '7M', clock: '90 MHz', cudaCores: 'N/A', memory: '16MB SDRAM', highlight: 'Twin Texel architecture — two pixel pipelines', features: ['Dual pixel pipelines', '24-bit color', 'DirectX 6', '8M triangles/sec'], transistorScale: 0.08 },
+    { name: 'RIVA TNT2', year: '1999', codename: 'NV5', transistors: '15M', clock: '150 MHz', cudaCores: 'N/A', memory: '32MB SDRAM', highlight: '150MHz core — crushed 3Dfx in performance', features: ['32-bit rendering', 'AGP 4x', 'DirectX 6.1', '9M triangles/sec'], transistorScale: 0.15 },
+    { name: 'GeForce 256', year: '1999', codename: 'NV10', transistors: '23M', clock: '120 MHz', cudaCores: 'N/A', memory: '32MB SDRAM/DDR', highlight: 'The world\'s first GPU — hardware T&L changed everything', features: ['Hardware T&L', 'Transform & Lighting engine', 'DirectX 7', '256-bit memory bus', '15M triangles/sec'], transistorScale: 0.23 },
+  ],
+  ch02: [
+    { name: 'GeForce 3', year: '2001', codename: 'NV20', transistors: '57M', clock: '200 MHz', cudaCores: 'N/A', memory: '64MB DDR', highlight: 'First programmable shaders — graphics became software', features: ['Programmable vertex shaders', 'Programmable pixel shaders', 'Lightspeed Memory Architecture', 'DirectX 8'], transistorScale: 0.57 },
+    { name: 'GeForce FX 5800', year: '2002', codename: 'NV30', transistors: '125M', clock: '400 MHz', cudaCores: 'N/A', memory: '128MB GDDR2', highlight: 'DirectX 9 — but the "Dustbuster" cooler was infamous', features: ['DirectX 9 support', '128-bit floating point precision', 'DDR2 memory', 'Dual DVI output'], transistorScale: 0.65 },
+    { name: 'GeForce 6800 Ultra', year: '2004', codename: 'NV40', transistors: '222M', clock: '400 MHz', cudaCores: 'N/A', memory: '256MB GDDR3', highlight: 'Shader Model 3.0 — NVIDIA\'s comeback king', features: ['Shader Model 3.0', '16 pixel pipelines', 'SLI multi-GPU support', 'GDDR3 memory'], transistorScale: 0.78 },
+    { name: 'GeForce 7800 GTX', year: '2005', codename: 'G70', transistors: '302M', clock: '430 MHz', cudaCores: 'N/A', memory: '256MB GDDR3', highlight: '24 pixel pipelines — raw brute force', features: ['24 pixel pipelines', 'CineFX 4.0', 'Transparency AA', 'PureVideo HD'], transistorScale: 0.85 },
+    { name: 'GeForce 8800 GTX', year: '2006', codename: 'G80', transistors: '681M', clock: '575 MHz', cudaCores: '128', memory: '768MB GDDR3', highlight: 'Unified shaders + CUDA — the GPU became a general-purpose computer', features: ['Unified shader architecture', 'CUDA support', '128 stream processors', 'DirectX 10', 'Shader Model 4.0'], transistorScale: 0.92 },
+  ],
+  ch03: [
+    { name: 'GeForce GTX 280', year: '2008', codename: 'GT200', transistors: '1.4B', clock: '602 MHz', cudaCores: '240', memory: '1GB GDDR3', highlight: 'First billion-transistor GPU — compute was now serious', features: ['1.4 billion transistors', '240 CUDA cores', 'Double precision FP', 'CUDA 1.1'], transistorScale: 0.15 },
+    { name: 'GeForce GTX 480', year: '2010', codename: 'GF100', transistors: '3B', clock: '700 MHz', cudaCores: '480', memory: '1.5GB GDDR5', highlight: 'Fermi architecture — hot but powerful, 512 CUDA cores', features: ['Fermi architecture', '480 CUDA cores', 'GDDR5 memory', 'ECC memory support', 'Tessellation engine'], transistorScale: 0.35 },
+    { name: 'GeForce GTX 580', year: '2010', codename: 'GF110', transistors: '3B', clock: '772 MHz', cudaCores: '512', memory: '1.5GB GDDR5', highlight: 'Fermi refined — the card that beat AMD at its peak', features: ['512 CUDA cores', 'Improved thermals', 'DirectX 11', '3D Vision Surround'], transistorScale: 0.40 },
+    { name: 'GeForce GTX 680', year: '2012', codename: 'GK104', transistors: '3.5B', clock: '1006 MHz', cudaCores: '1536', memory: '2GB GDDR5', highlight: 'Kepler — efficiency leap, 1536 CUDA cores at 1GHz', features: ['Kepler architecture', '1536 CUDA cores', 'GPU Boost 1.0', 'DirectX 11.1', 'FXAA/TXAA'], transistorScale: 0.45 },
+  ],
+  ch04: [
+    { name: 'GeForce GTX 780 Ti', year: '2013', codename: 'GK110', transistors: '7.1B', clock: '875 MHz', cudaCores: '2880', memory: '3GB GDDR5', highlight: 'Kepler at its finest — 2880 CUDA cores', features: ['2880 CUDA cores', 'GK110 full chip', 'GPU Boost 2.0', 'G-SYNC support'], transistorScale: 0.55 },
+    { name: 'GeForce GTX 980 Ti', year: '2015', codename: 'GM200', transistors: '8B', clock: '1000 MHz', cudaCores: '2816', memory: '6GB GDDR5', highlight: 'Maxwell — incredible performance per watt', features: ['Maxwell 2.0 architecture', '2816 CUDA cores', '6GB GDDR5', 'DSR (Dynamic Super Resolution)', 'VXGI'], transistorScale: 0.65 },
+    { name: 'GeForce GTX 1080 Ti', year: '2017', codename: 'GP102', transistors: '12B', clock: '1481 MHz', cudaCores: '3584', memory: '11GB GDDR5X', highlight: 'Pascal — the GOAT of GPUs, still relevant years later', features: ['Pascal architecture', '3584 CUDA cores', '11GB GDDR5X', '484 GB/s bandwidth', 'Simultaneous Multi-Projection', 'VR Ready'], transistorScale: 0.75 },
+  ],
+  ch05: [
+    { name: 'GeForce RTX 2080 Ti', year: '2018', codename: 'TU102', transistors: '18.6B', clock: '1350 MHz', cudaCores: '4352', memory: '11GB GDDR6', highlight: 'Real-time ray tracing arrived — Turing changed everything', features: ['Turing architecture', '4352 CUDA cores', 'RT Cores (real-time ray tracing)', 'Tensor Cores (DLSS)', '11GB GDDR6', 'USB-C VirtualLink'], transistorScale: 0.85 },
+    { name: 'GeForce RTX 3090', year: '2020', codename: 'GA102', transistors: '28B', clock: '1395 MHz', cudaCores: '10496', memory: '24GB GDDR6X', highlight: 'The "Big Ferocious" — 24GB for creators and gamers', features: ['Ampere architecture', '10496 CUDA cores', '82 RT cores (2nd gen)', '328 Tensor cores (3rd gen)', '24GB GDDR6X', 'HDMI 2.1', 'PCIe Gen 4'], transistorScale: 0.93 },
+  ],
+  ch06: [
+    { name: 'GeForce RTX 4090', year: '2022', codename: 'AD102', transistors: '76.3B', clock: '2235 MHz', cudaCores: '16384', memory: '24GB GDDR6X', highlight: 'Ada Lovelace — DLSS 3, 4nm, a generational leap', features: ['Ada Lovelace architecture', '16384 CUDA cores', 'DLSS 3 Frame Generation', '4nm TSMC process', '1.8TB/s bandwidth', 'AV1 encoding', 'PCIe Gen 4'], transistorScale: 0.97 },
+    { name: 'GeForce RTX 5090', year: '2025', codename: 'GB202', transistors: '92.2B', clock: '2400 MHz', cudaCores: '21760', memory: '32GB GDDR7', highlight: 'Blackwell — neural rendering, DLSS 4, the new king', features: ['Blackwell architecture', '21760 CUDA cores', 'DLSS 4 Multi Frame Gen', 'Neural rendering', 'GDDR7 memory', 'PCIe Gen 5', 'AI management processor'], transistorScale: 1.0 },
+  ],
+  ch06b: [
+    { name: 'NVIDIA H100', year: '2022', codename: 'GH100', transistors: '80B', clock: '1590 MHz', cudaCores: '18432', memory: '80GB HBM3', highlight: 'Hopper — the AI supercomputer that trains the world\'s models', features: ['Hopper architecture', 'Transformer Engine', 'FP8 precision', '80GB HBM3', '3.35TB/s bandwidth', 'NVLink Switch', 'MIG partitioning'], transistorScale: 0.75 },
+    { name: 'NVIDIA B200', year: '2024', codename: 'GB200', transistors: '208B', clock: '1800 MHz', cudaCores: '16896', memory: '192GB HBM3e', highlight: 'Blackwell data center — 208B transistors, AI factories at scale', features: ['Blackwell architecture', 'Dual-die design', 'FP8/FP6/FP4 support', 'NVLink 5 (1.8 TB/s)', 'Second-gen Transformer Engine', 'Liquid cooling'], transistorScale: 0.88 },
+    { name: 'GB300 Ultra', year: '2025', codename: 'B300', transistors: '240B', clock: '1900 MHz', cudaCores: '19968', memory: '288GB HBM3e', highlight: 'Blackwell Ultra — 288GB HBM3e, 1.5x Blackwell performance', features: ['Blackwell Ultra architecture', '288GB HBM3e memory', '1.5x AI perf vs B200', 'NVLink 5 enhanced', 'GB300 NVL72 rack solution', '1,000 tokens/sec inference'], transistorScale: 0.93 },
+  ],
+  ch07: [
+    { name: 'Vera Rubin GV100', year: '2026', codename: 'R100', transistors: '336B', clock: '2200 MHz', cudaCores: '24576', memory: '288GB HBM4', highlight: 'Vera Rubin — 336B transistors, 3nm, the AI factory architecture', features: ['Vera Rubin architecture', 'TSMC 3nm process', 'Dual-die reticle-sized package', '288GB HBM4 (22 TB/s)', 'NVLink 6 (3.6 TB/s)', '50 PFLOPS FP4 inference', 'Vera CPU Arm-based (88 Olympus cores)'], transistorScale: 0.97 },
+    { name: 'Rubin Ultra R300', year: '2027', codename: 'R300', transistors: '600B', clock: '2400 MHz', cudaCores: '32768', memory: '1TB HBM4', highlight: 'Rubin Ultra — 1TB memory, 100 PFLOPS, NVL576 rack dominance', features: ['Rubin Ultra architecture', 'Dual Rubin dies', '~1TB HBM4 memory', '100 PFLOPS FP4', 'NVL576 rack (15 exaflops)', 'NVLink 6 enhanced', '5 exaflops FP8 training'], transistorScale: 1.0 },
+  ],
+  ch08: [
+    { name: 'Feynman', year: '2028', codename: 'Feynman', transistors: 'TBA', clock: 'TBA', cudaCores: 'TBA', memory: 'TBA', highlight: 'Named after Richard Feynman — the future of GPU architecture', features: ['Next-gen architecture', 'Annual cadence successor to Rubin', 'AI factory optimization', 'Advanced process node'], transistorScale: 1.0 },
+  ],
+}
