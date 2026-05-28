@@ -51,15 +51,6 @@ function VendorHero() {
         <div className="absolute top-[15%] right-[5%] w-[35%] h-[35%]" style={{ backgroundColor: `${accent}0D`, filter: 'blur(120px)', borderRadius: '50%' }} />
         <div className="absolute bottom-[5%] left-[25%] w-[30%] h-[30%]" style={{ backgroundColor: `${color}08`, filter: 'blur(100px)', borderRadius: '50%' }} />
       </div>
-
-      <div className={`absolute bottom-10 left-1/2 -translate-x-1/2 ${vis ? 'animate-fade-in delay-500' : 'opacity-0'}`}>
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-xs text-zinc-600 tracking-widest uppercase">Scroll</span>
-          <div className="w-5 h-8 rounded-full border border-zinc-700 flex justify-center pt-1.5">
-            <div className="w-1 h-2 rounded-full bg-zinc-500 animate-float" />
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

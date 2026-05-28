@@ -9,7 +9,7 @@ import Navbar from './components/Navbar';
 import Scene from './3d/Scene';
 import Footer from './components/Footer';
 import Hero from './chapters/Hero';
-import ChapterNav from './components/ChapterNav';
+
 import MobileNav from './components/MobileNav';
 import OfflineIndicator from './components/OfflineIndicator';
 import AccessibleAnnouncer from './components/AccessibleAnnouncer';
@@ -228,7 +228,7 @@ function AppContent() {
             <AccessibleAnnouncer />
             <OfflineIndicator />
             <main id="main-content" role="main" tabIndex={-1} className="relative z-10 w-full">
-              <div id="scroll-container" className="pb-48 md:pb-64">
+              <div id="scroll-container" className="pb-64 md:pb-96">
                 <Hero />
                 <VendorChapters />
               </div>
@@ -236,7 +236,6 @@ function AppContent() {
             <Footer />
           </div>
         </div>
-        <ChapterNav />
         <MobileNav />
       </div>
     </ReactLenis>

@@ -39,8 +39,8 @@ function getEnvironmentalSpecs(props: GPUCardData | CPUCardData) {
 
 function Spec({ label, val, large }: { label: string; val: string; large?: boolean }) {
   return (
-    <div className="rounded-lg px-3 py-2 transition-all duration-200 hover:-translate-y-0.5" style={{ background: 'rgba(0,0,0,0.25)', border: '0.5px solid rgba(255,255,255,0.04)' }}>
-      <div className="text-zinc-600 text-[10px] uppercase tracking-wider">{label}</div>
+    <div className="rounded-lg px-3 py-2 transition-all duration-200 hover:-translate-y-0.5" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-zinc-500 text-[10px] uppercase tracking-wider">{label}</div>
       <div className={`text-white ${large ? 'text-2xl' : 'text-sm'} font-mono`}>{val}</div>
     </div>
   )
@@ -48,8 +48,8 @@ function Spec({ label, val, large }: { label: string; val: string; large?: boole
 
 function MiniSpec({ label, val }: { label: string; val: string }) {
   return (
-    <div className="rounded-md px-2 py-1" style={{ background: 'rgba(0,0,0,0.25)', border: '0.5px solid rgba(255,255,255,0.04)' }}>
-      <div className="text-zinc-600 text-[9px] uppercase tracking-wider">{label}</div>
+    <div className="rounded-md px-2 py-1" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-zinc-500 text-[9px] uppercase tracking-wider">{label}</div>
       <div className="text-white text-xs font-mono">{val}</div>
     </div>
   )
@@ -104,10 +104,10 @@ export default function GPUCard(props: CardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative ${isLowTier ? '' : 'backdrop-blur-xl'} animate-fade-up transition-transform duration-300 ease-out overflow-hidden`}
+      className={`relative backdrop-blur-xl animate-fade-up transition-transform duration-300 ease-out overflow-hidden`}
       style={{
         border: 'var(--era-border, 1px solid rgba(255,255,255,0.05))',
-        background: 'rgba(255, 255, 255, 0.015)',
+        background: 'rgba(255, 255, 255, 0.03)',
         borderRadius: 'var(--era-radius, 16px)',
         boxShadow: isLowTier ? 'none' : '0 8px 32px rgba(0,0,0,0.4)',
         transform: 'var(--era-card-transform, none) perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))',

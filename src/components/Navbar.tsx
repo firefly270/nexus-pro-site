@@ -105,11 +105,7 @@ export default function Navbar() {
           <a href={isSelected ? `#${chapters[0]?.id ?? ''}` : '#vendor-picker'} className="flex items-center gap-1.5 text-white shrink-0" aria-label={isSelected ? `Home - ${config?.label}` : 'Choose a vendor'}>
             <span className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] shadow" style={{ background: `linear-gradient(135deg, ${color}, ${accent})` }} aria-hidden="true">{config?.icon ?? '◇'}</span>
           </a>
-          <nav aria-label="Chapter quick navigation" className="hidden md:flex items-center gap-1">
-            {isSelected && chapters.slice(0, 8).map((ch, i) => (
-              <a key={ch.id} href={`#${ch.id}`} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === current ? 'scale-125' : 'bg-zinc-700 hover:bg-zinc-500'}`} style={{ backgroundColor: i === current ? color : undefined, boxShadow: i === current ? `0 0 4px ${color}` : undefined }} aria-label={`Go to ${ch.label}`} aria-current={i === current ? 'location' : undefined} />
-            ))}
-          </nav>
+
           <div className="hidden md:flex items-center gap-1 text-[10px] text-zinc-500 mr-0.5">
             {isSelected && (
               <span className="truncate max-w-[80px] animate-breathe-width">{label}</span>

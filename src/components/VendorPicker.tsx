@@ -103,15 +103,6 @@ export default function VendorPicker() {
         <div className="absolute top-[15%] right-[5%] w-[35%] h-[35%] bg-zinc-400/5 blur-[120px] rounded-full" />
         <div className="absolute bottom-[5%] left-[25%] w-[30%] h-[30%] bg-zinc-600/3 blur-[100px] rounded-full" />
       </div>
-
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-fade-in delay-500">
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-xs text-zinc-600 tracking-widest uppercase">Pick a path</span>
-          <div className="w-5 h-8 rounded-full border border-zinc-700 flex justify-center pt-1.5">
-            <div className="w-1 h-2 rounded-full bg-zinc-500 animate-float" />
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

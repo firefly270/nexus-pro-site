@@ -7,10 +7,10 @@ interface BentoGridProps {
 
 const layouts: Record<number, string[]> = {
   1: ['full'],
-  2: ['hero', 'compact'],
-  3: ['hero', 'compact', 'full'],
-  4: ['hero', 'compact', 'compact', 'full'],
-  5: ['hero', 'compact', 'compact', 'full', 'compact'],
+  2: ['full', 'hero'],
+  3: ['full', 'hero', 'compact'],
+  4: ['full', 'hero', 'compact', 'hero'],
+  5: ['full', 'hero', 'compact', 'hero', 'compact'],
 }
 
 export default function BentoGrid({ cards }: BentoGridProps) {
