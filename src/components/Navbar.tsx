@@ -14,7 +14,6 @@ const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
 export default function Navbar() {
   const { vendor, chapters, config, clearVendor, isSelected } = useVendor();
   const [current, setCurrent] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const ticking = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -37,8 +36,6 @@ export default function Navbar() {
       if (!ticking.current) {
         requestAnimationFrame(() => {
           const sy = window.scrollY;
-          const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
-          setProgress(Math.min(sy / (docH - window.innerHeight), 1));
           setCurrent(() => {
             for (let i = ranges.length - 1; i >= 0; i--) {
               const r = ranges[i];
@@ -103,11 +100,6 @@ export default function Navbar() {
 
   return (
     <>
-      {isSelected && (
-        <div className="fixed top-0 left-0 right-0 z-[60] h-[1px] pointer-events-none" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Page progress">
-          <div className="h-full transition-all duration-150 ease-out" style={{ width: `${progress * 100}%`, background: `linear-gradient(to right, ${color}, ${accent})` }} />
-        </div>
-      )}
       <header className="fixed top-3 right-3 z-50" role="banner">
         <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-xl border border-white/[0.06] rounded-full px-2.5 py-1.5 shadow-lg">
           <a href={isSelected ? `#${chapters[0]?.id ?? ''}` : '#vendor-picker'} className="flex items-center gap-1.5 text-white shrink-0" aria-label={isSelected ? `Home - ${config?.label}` : 'Choose a vendor'}>

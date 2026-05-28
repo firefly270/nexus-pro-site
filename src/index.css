@@ -175,9 +175,8 @@ body::after {
   mix-blend-mode: overlay;
 }
 *:focus-visible {
-  outline: 2px solid #00D4AA;
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 2px solid var(--vendor-accent, var(--vendor-color, #76B900));
+  outline-offset: 4px;
 }
 .sr-only {
   position: absolute;

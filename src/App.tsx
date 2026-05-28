@@ -156,6 +156,9 @@ function AppContent() {
     if (config?.color) {
       document.documentElement.style.setProperty('--vendor-color', config.color);
     }
+    if (config?.accent) {
+      document.documentElement.style.setProperty('--vendor-accent', config.accent);
+    }
   }, [config?.color]);
 
   useEffect(() => {
@@ -224,8 +227,8 @@ function AppContent() {
             <Navbar />
             <AccessibleAnnouncer />
             <OfflineIndicator />
-            <main id="main-content" role="main" tabIndex={-1}>
-              <div id="scroll-container">
+            <main id="main-content" role="main" tabIndex={-1} className="relative z-10 w-full">
+              <div id="scroll-container" className="pb-48 md:pb-64">
                 <Hero />
                 <VendorChapters />
               </div>
