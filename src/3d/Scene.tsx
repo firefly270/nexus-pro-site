@@ -16,6 +16,8 @@ import NVLinkRack from './NVLinkRack'
 import AMDChipletDie from './AMD_ChipletDie'
 import IntelMeshInterconnect from './Intel_MeshInterconnect'
 import CameraSpline from './CameraSpline'
+import FluidSimulation from './FluidSimulation'
+import PortalOverlay from './PortalOverlay'
 
 gsap.registerPlugin(ScrollTrigger)
 gsap.ticker.lagSmoothing(0)
@@ -98,6 +100,8 @@ function SceneContent() {
       )}
       {vendor === 'amd' && <AMDChipletDie groupRef={amdRef} />}
       {vendor === 'intel' && <IntelMeshInterconnect groupRef={intelRef} />}
+      <FluidSimulation />
+      <PortalOverlay />
       <DataParticles scrollRef={scrollRef} count={isMobile ? 500 : Math.round(3000 * settings.particleMultiplier)} />
       <SiliconWafer scrollRef={scrollRef} />
       <EffectComposer enableNormalPass={false}>

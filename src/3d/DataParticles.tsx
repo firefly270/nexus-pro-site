@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useRef, useState, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-
-const _mouseVec = new THREE.Vector3()
+import { getVelocityBufferRef } from './FluidSimulation'
 
 function rng(seed: number) {
   let s = seed
@@ -32,65 +31,55 @@ function makeColors(count: number) {
   for (let i = 0; i < count; i++) {
     const t = rand()
     const c = green.clone().lerp(cyan, t)
-    col[i * 3] = c.r
-    col[i * 3 + 1] = c.g
-    col[i * 3 + 2] = c.b
+    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b
   }
   return col
 }
 
 export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: React.RefObject<number>; count?: number }) {
   const ref = useRef<THREE.Points>(null)
-  const { pointer, camera } = useThree()
-  const mouseTarget = useRef(new THREE.Vector3())
   const frameSkip = useRef(0)
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
   const skipEvery = isMobile ? 3 : 1
 
-  const [{ positions, phases }] = useState(() => makeParticles(count))
+  const { positions, phases } = useMemo(() => makeParticles(count), [count])
   const [colors] = useState(() => makeColors(count))
 
   useFrame((state) => {
     const el = ref.current
     if (!el) return
-    el.position.z = scrollRef.current * 2
+    el.position.z = scrollRef.current! * 2
 
     frameSkip.current = (frameSkip.current + 1) % skipEvery
     if (frameSkip.current !== 0) return
 
-    const s = scrollRef.current
+    const s = scrollRef.current!
     const speed = 0.3 + s * 0.5
     const geo = el.geometry
-    const pos = geo.attributes.position as THREE.BufferAttribute
-    const arr = pos.array as Float32Array
+    const attr = geo.attributes.position as THREE.BufferAttribute
+    const arr = attr.array as Float32Array
     const phArr = phases as Float32Array
+    const velBuf = getVelocityBufferRef()
 
-    const mouse3D = _mouseVec.set(pointer.x, pointer.y, 0.5).unproject(camera)
-    const dir = mouse3D.sub(camera.position).normalize()
-    const dist = -camera.position.z / dir.z
-    mouseTarget.current.copy(camera.position).add(dir.multiplyScalar(dist))
-
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < count!; i++) {
       const idx = i * 3
       const angle = Math.atan2(arr[idx + 2]!, arr[idx]!) + speed * 0.01
       const radius = Math.sqrt(arr[idx]! * arr[idx]! + arr[idx + 2]! * arr[idx + 2]!)
       arr[idx] = Math.cos(angle) * radius
       arr[idx + 2] = Math.sin(angle) * radius
-      const prevY = arr[idx + 1]!
-      arr[idx + 1] = prevY + (Math.sin(state.clock.elapsedTime * 0.5 + phArr[i]!) - prevY) * 0.02
+      arr[idx + 1] = arr[idx + 1]! + (Math.sin(state.clock.elapsedTime * 0.5 + phArr[i]!) - arr[idx + 1]!) * 0.02
 
-      const dx = mouseTarget.current.x - arr[idx]!
-      const dy = mouseTarget.current.y - arr[idx + 1]!
-      const dz = mouseTarget.current.z - arr[idx + 2]!
-      const d = Math.sqrt(dx * dx + dy * dy + dz * dz)
-      if (d < 3) {
-        const force = (1 - d / 3) * 0.008
-        arr[idx]! += dx * force
-        arr[idx + 1]! += dy * force * 0.5
-        arr[idx + 2]! += dz * force
+      if (velBuf) {
+        const ux = (arr[idx]! * 0.05 + 0.5) * 128
+        const uy = (arr[idx + 2]! * 0.05 + 0.5) * 128
+        const fi = (Math.floor(uy) * 128 + Math.floor(ux)) * 4
+        if (fi >= 0 && fi + 2 < velBuf!.length) {
+          arr[idx] = arr[idx]! + velBuf[fi]! * 0.002
+          arr[idx + 2] = arr[idx + 2]! + velBuf[fi + 1]! * 0.002
+        }
       }
     }
-    pos.needsUpdate = true
+    attr.needsUpdate = true
   })
 
   return (

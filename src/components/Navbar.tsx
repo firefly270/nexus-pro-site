@@ -7,11 +7,12 @@ import ThemeToggle from './ThemeToggle';
 import AudioToggle from './AudioToggle';
 import { announce } from './AccessibleAnnouncer';
 import { AudioEngine } from '../utils/audioManager';
+import { useBoundStore } from '../store/useBoundStore';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
 
 export default function Navbar() {
-  const { vendor, chapters, config, setVendor, clearVendor, isSelected } = useVendor();
+  const { vendor, chapters, config, clearVendor, isSelected } = useVendor();
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -86,9 +87,10 @@ export default function Navbar() {
     const vc = vendorConfigs[v];
     AudioEngine.playSwoosh(vendor ? 'down' : 'up');
     announce(`Switched to ${vc?.label ?? v}`);
-    setVendor(v);
+    const trans = useBoundStore.getState().transition;
+    if (trans.phase !== 'idle') return;
+    useBoundStore.getState().startTransition(v);
     setMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleClearVendor = () => {

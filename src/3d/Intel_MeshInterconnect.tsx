@@ -18,6 +18,7 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
   const tempColor = useMemo(() => new THREE.Color(), [])
   const { pointer } = useThree()
   const prevScroll = useRef(0)
+  const heatVal = useRef(0)
 
   const gridSize = 5
   const spacing = 0.35
@@ -68,6 +69,10 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
     prevScroll.current = s
     u.uDepth.value = Math.min(velocity * 10, 1)
     u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
+
+    heatVal.current += velocity * 0.1
+    heatVal.current *= Math.exp(-state.clock.getDelta() * 0.5)
+    u.uHeat.value = Math.max(0, Math.min(1, heatVal.current))
 
     tilePositions.forEach((_, i) => {
       const isOn = i < activeCount ? 1 : 0

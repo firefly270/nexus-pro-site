@@ -3,6 +3,8 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import type { Vendor, VendorConfig, Chapter } from '../types';
 import { vendorConfigs, vendorChapters } from '../constants/vendors';
 import type { QualityLevel, PerformanceSettings } from '../hooks/usePerformanceOrchestrator';
+import type { TransitionState } from '../3d/SceneTransition';
+import { createTransition } from '../3d/SceneTransition';
 
 export interface TransientState {
   scrollProgress: number;
@@ -16,20 +18,24 @@ interface StoreState {
   isAudioMuted: boolean;
   quality: QualityLevel;
   settings: PerformanceSettings;
+  transition: TransitionState;
   transient: TransientState;
   setVendor: (v: Vendor | null) => void;
   clearVendor: () => void;
   toggleAudio: () => void;
+  startTransition: (to: Vendor) => void;
+  updateTransition: (ts: TransitionState) => void;
 }
 
 export const useBoundStore = create<StoreState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
     vendor: null,
     config: null,
     chapters: [],
     isAudioMuted: true,
     quality: 'ultra',
     settings: { dpr: 2, particleMultiplier: 1, bloomIntensity: 1, fogEnabled: true, caEnabled: true },
+    transition: { phase: 'idle', progress: 0, fromVendor: null, toVendor: null },
     transient: {
       scrollProgress: 0,
       mousePosition: [0, 0],
@@ -47,6 +53,11 @@ export const useBoundStore = create<StoreState>()(
     },
     clearVendor: () => set({ vendor: null, config: null, chapters: [] }),
     toggleAudio: () => set((s) => ({ isAudioMuted: !s.isAudioMuted })),
+    startTransition: (to) => {
+      const { vendor } = get()
+      set({ transition: createTransition(vendor, to) })
+    },
+    updateTransition: (ts) => set({ transition: ts }),
   })),
 );
 

@@ -2,12 +2,7 @@ uniform vec3 uColor1;
 uniform vec3 uColor2;
 uniform float uTime;
 uniform float uDepth;
-
-varying vec3 vInstanceColor;
-varying float vFresnel;
-varying vec2 vUv;
-varying vec3 vWorldPos;
-varying vec3 vWorldNormal;
+uniform float uHeat;
 
 float hash2(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -39,16 +34,35 @@ float hexGrid(vec3 p) {
 }
 
 float sceneSDF(vec3 p) {
-  float depthLayer = p.y + 0.5;
   float grid = hexGrid(p * 4.0) * 0.15;
   float circuit = circuitLayer(p * 6.0, uTime * 0.1) * 0.3;
   float via = smoothstep(0.3, 0.5, hash2(p.xz * 10.0 + floor(p.y * 20.0))) * 0.2;
   return grid + circuit + via;
 }
 
+vec3 thermalRamp(float heat) {
+  vec3 cold = vec3(1.0, 0.2, 0.0);
+  vec3 hot = vec3(1.0, 0.9, 0.2);
+  vec3 white = vec3(1.0, 1.0, 0.95);
+  float t = smoothstep(0.0, 1.0, heat);
+  vec3 ramp = mix(cold, hot, t);
+  ramp = mix(ramp, white, smoothstep(0.7, 1.0, heat));
+  return clamp(ramp + vec3(0.1, 0.0, 0.0) * sin(heat * 20.0 + uTime * 0.5), 0.0, 1.0);
+}
+
 void main() {
   float iri = sin(vFresnel * 12.0 + uTime * 0.08) * 0.5 + 0.5;
   vec3 iriColor = mix(uColor1, uColor2, iri);
+
+  vec3 final = mix(vInstanceColor, iriColor, 0.25 * vFresnel);
+  final += vInstanceColor * 0.3;
+
+  float heat = clamp(uHeat, 0.0, 1.0);
+  if (heat > 0.05) {
+    vec3 thermal = thermalRamp(heat);
+    final = mix(final, thermal, heat * 0.6);
+    final += thermal * heat * 0.4;
+  }
 
   vec3 viewDir = normalize(cameraPosition - vWorldPos);
   vec3 rayPos = vWorldPos + vWorldNormal * 0.01;
@@ -71,11 +85,8 @@ void main() {
       if (depthAccum > 1.0) break;
     }
     internalColor *= uDepth * 0.5;
+    final += internalColor;
   }
-
-  vec3 final = mix(vInstanceColor, iriColor, 0.25 * vFresnel);
-  final += vInstanceColor * 0.3;
-  final += internalColor;
 
   gl_FragColor = vec4(final, 1.0);
 }

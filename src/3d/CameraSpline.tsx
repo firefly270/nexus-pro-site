@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useVendor } from '../context/VendorContext'
 import { useBoundStore } from '../store/useBoundStore'
+import { tickTransition, shouldSwapVendor } from './SceneTransition'
 
 interface KfPt {
   x: number; y: number; z: number
@@ -54,6 +55,7 @@ export default function CameraSpline() {
   const currentTarget = useRef(new THREE.Vector3())
   const tempPos = useRef(new THREE.Vector3())
   const tempTarget = useRef(new THREE.Vector3())
+  const swapped = useRef(false)
 
   const splines = useMemo(() => {
     const pts = KF_MAP[vendor ?? 'nvidia'] ?? NVIDIA_KF
@@ -66,14 +68,36 @@ export default function CameraSpline() {
   }, [vendor])
 
   useFrame((_, delta) => {
-    const t = useBoundStore.getState().transient.scrollProgress
-    const clamped = THREE.MathUtils.clamp(t, 0, 1)
+    const store = useBoundStore.getState()
+    const trans = store.transition
+    let t = store.transient.scrollProgress
+    let lerpSpeed = 4
 
+    if (trans.phase !== 'idle') {
+      const updated = tickTransition(trans, delta)
+      if (updated !== trans) {
+        useBoundStore.getState().updateTransition(updated)
+      }
+      t = trans.progress * 0.3
+      lerpSpeed = 8
+
+      if (shouldSwapVendor(updated) && !swapped.current) {
+        if (trans.toVendor) {
+          store.setVendor(trans.toVendor)
+        }
+        swapped.current = true
+      }
+      if (updated.phase === 'idle') {
+        swapped.current = false
+      }
+    }
+
+    const clamped = THREE.MathUtils.clamp(t, 0, 1)
     splines.posSpline.getPointAt(clamped, tempPos.current)
     splines.tgtSpline.getPointAt(clamped, tempTarget.current)
 
-    currentPos.current.lerp(tempPos.current, delta * 4)
-    currentTarget.current.lerp(tempTarget.current, delta * 4)
+    currentPos.current.lerp(tempPos.current, delta * lerpSpeed)
+    currentTarget.current.lerp(tempTarget.current, delta * lerpSpeed)
 
     camera.position.copy(currentPos.current)
     camera.lookAt(currentTarget.current)
