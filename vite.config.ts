@@ -1,10 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer'
 import sitemap from 'vite-plugin-sitemap'
-import compress from 'vite-plugin-compression'
 const isAnalyze = process.argv.some(a => a === 'analyze' || a === '--mode analyze')
 
 export default defineConfig({
@@ -13,33 +11,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     sitemap({ hostname: 'https://gpurevolution.space/' }),
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
-      manifest: {
-        name: 'The GPU Revolution — 30 Years of NVIDIA',
-        short_name: 'GPU Revolution',
-        description: 'A 3D scrollytelling journey through 30 years of NVIDIA GPU history',
-        theme_color: '#030303',
-        background_color: '#030303',
-        display: 'standalone',
-        icons: [
-          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
-        ],
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,webmanifest}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/.*\/assets\/.*/,
-            handler: 'CacheFirst',
-            options: { cacheName: 'assets', expiration: { maxEntries: 50, maxAgeSeconds: 86400 * 30 } },
-          },
-        ],
-      },
-    }),
     isAnalyze && visualizer({ filename: 'dist/stats.html', open: true }),
-    compress({ algorithm: 'gzip', ext: '.gz', deleteOriginFile: false }),
   ].filter(Boolean),
   server: {
     headers: {
