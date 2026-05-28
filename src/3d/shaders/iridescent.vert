@@ -4,6 +4,9 @@ uniform vec2 uMouse;
 
 varying vec3 vInstanceColor;
 varying float vFresnel;
+varying vec2 vUv;
+varying vec3 vWorldPos;
+varying vec3 vWorldNormal;
 
 void main() {
   vInstanceColor = instanceColor;
@@ -23,6 +26,10 @@ void main() {
   vec3 worldNormal = normalize((instanceMatrix * vec4(normal, 0.0)).xyz);
   vec3 viewDir = normalize(cameraPosition - worldPos.xyz);
   vFresnel = 1.0 - abs(dot(viewDir, worldNormal));
+
+  vUv = uv;
+  vWorldPos = worldPos.xyz;
+  vWorldNormal = worldNormal;
 
   gl_Position = projectionMatrix * mvPosition;
 }

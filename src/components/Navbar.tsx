@@ -6,7 +6,6 @@ import ShareButton from './ShareButton';
 import ThemeToggle from './ThemeToggle';
 import AudioToggle from './AudioToggle';
 import { announce } from './AccessibleAnnouncer';
-
 import { AudioEngine } from '../utils/audioManager';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
@@ -39,13 +38,13 @@ export default function Navbar() {
           const sy = window.scrollY;
           const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
           setProgress(Math.min(sy / (docH - window.innerHeight), 1));
-
-          let found = false;
-          for (let i = ranges.length - 1; i >= 0; i--) {
-            const r = ranges[i];
-            if (r !== undefined && sy >= r) { setCurrent(i); found = true; break; }
-          }
-          if (!found) { setCurrent(0); }
+          setCurrent(() => {
+            for (let i = ranges.length - 1; i >= 0; i--) {
+              const r = ranges[i];
+              if (r !== undefined && sy >= r) return i;
+            }
+            return 0;
+          });
           ticking.current = false;
         });
         ticking.current = true;
@@ -60,6 +59,13 @@ export default function Navbar() {
       window.removeEventListener('resize', onResize);
     };
   }, [chapters, isSelected]);
+
+  useEffect(() => {
+    const ch = chapters[current];
+    if (ch?.era) {
+      document.documentElement.setAttribute('data-era', ch.era);
+    }
+  }, [chapters, current]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {

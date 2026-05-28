@@ -43,35 +43,35 @@ export const vendorConfigs: Record<string, VendorConfig> = {
 }
 
 export const nvidiaChapters: Chapter[] = [
-  { id: 'ch-01-beginning', label: 'The Beginning', vendor: 'nvidia' },
-  { id: 'ch-02-shaders', label: 'Shader Revolution', vendor: 'nvidia' },
-  { id: 'ch-03-cuda', label: 'CUDA Era', vendor: 'nvidia' },
-  { id: 'ch-04-maxwell', label: 'Dominance', vendor: 'nvidia' },
-  { id: 'ch-05-raytracing', label: 'Ray Tracing', vendor: 'nvidia' },
-  { id: 'ch-06-ai', label: 'AI Consumer', vendor: 'nvidia' },
-  { id: 'ch-06b-datacenter', label: 'Data Center', vendor: 'nvidia' },
-  { id: 'ch-07-architecture', label: 'Architecture', vendor: 'nvidia' },
-  { id: 'ch-08-future', label: 'Future', vendor: 'nvidia' },
+  { id: 'ch-01-beginning', label: 'The Beginning', era: 'blueprint', vendor: 'nvidia' },
+  { id: 'ch-02-shaders', label: 'Shader Revolution', era: 'acceleration', vendor: 'nvidia' },
+  { id: 'ch-03-cuda', label: 'CUDA Era', era: 'acceleration', vendor: 'nvidia' },
+  { id: 'ch-04-maxwell', label: 'Dominance', era: 'acceleration', vendor: 'nvidia' },
+  { id: 'ch-05-raytracing', label: 'Ray Tracing', era: 'neural', vendor: 'nvidia' },
+  { id: 'ch-06-ai', label: 'AI Consumer', era: 'neural', vendor: 'nvidia' },
+  { id: 'ch-06b-datacenter', label: 'Data Center', era: 'neural', vendor: 'nvidia' },
+  { id: 'ch-07-architecture', label: 'Architecture', era: 'neural', vendor: 'nvidia' },
+  { id: 'ch-08-future', label: 'Future', era: 'neural', vendor: 'nvidia' },
 ]
 
 export const amdChapters: Chapter[] = [
-  { id: 'ch-amd-01', label: 'K5 to Athlon', vendor: 'amd' },
-  { id: 'ch-amd-02', label: 'ATI + Opteron', vendor: 'amd' },
-  { id: 'ch-amd-03', label: 'Dark Times', vendor: 'amd' },
-  { id: 'ch-amd-04', label: 'Ryzen Revival', vendor: 'amd' },
-  { id: 'ch-amd-05', label: 'RDNA Rising', vendor: 'amd' },
-  { id: 'ch-amd-06', label: 'Current Era', vendor: 'amd' },
-  { id: 'ch-amd-07', label: 'Data Center', vendor: 'amd' },
+  { id: 'ch-amd-01', label: 'K5 to Athlon', era: 'acceleration', vendor: 'amd' },
+  { id: 'ch-amd-02', label: 'ATI + Opteron', era: 'acceleration', vendor: 'amd' },
+  { id: 'ch-amd-03', label: 'Dark Times', era: 'acceleration', vendor: 'amd' },
+  { id: 'ch-amd-04', label: 'Ryzen Revival', era: 'neural', vendor: 'amd' },
+  { id: 'ch-amd-05', label: 'RDNA Rising', era: 'neural', vendor: 'amd' },
+  { id: 'ch-amd-06', label: 'Current Era', era: 'neural', vendor: 'amd' },
+  { id: 'ch-amd-07', label: 'Data Center', era: 'neural', vendor: 'amd' },
 ]
 
 export const intelChapters: Chapter[] = [
-  { id: 'ch-intel-01', label: 'Foundations', vendor: 'intel' },
-  { id: 'ch-intel-02', label: 'Pentium Era', vendor: 'intel' },
-  { id: 'ch-intel-03', label: 'Core i Era', vendor: 'intel' },
-  { id: 'ch-intel-04', label: 'GPU Attempts', vendor: 'intel' },
-  { id: 'ch-intel-05', label: 'Hybrid Era', vendor: 'intel' },
-  { id: 'ch-intel-06', label: 'Arc & Arrow', vendor: 'intel' },
-  { id: 'ch-intel-07', label: 'Xeon', vendor: 'intel' },
+  { id: 'ch-intel-01', label: 'Foundations', era: 'blueprint', vendor: 'intel' },
+  { id: 'ch-intel-02', label: 'Pentium Era', era: 'acceleration', vendor: 'intel' },
+  { id: 'ch-intel-03', label: 'Core i Era', era: 'acceleration', vendor: 'intel' },
+  { id: 'ch-intel-04', label: 'GPU Attempts', era: 'acceleration', vendor: 'intel' },
+  { id: 'ch-intel-05', label: 'Hybrid Era', era: 'neural', vendor: 'intel' },
+  { id: 'ch-intel-06', label: 'Arc & Arrow', era: 'neural', vendor: 'intel' },
+  { id: 'ch-intel-07', label: 'Xeon', era: 'neural', vendor: 'intel' },
 ]
 
 export const vendorChapters: Record<string, Chapter[]> = {

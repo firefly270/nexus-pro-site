@@ -2,10 +2,13 @@ export type Vendor = 'nvidia' | 'amd' | 'intel'
 
 export type CardVariant = 'gpu' | 'cpu'
 
+export type Era = 'blueprint' | 'acceleration' | 'neural'
+
 export interface Chapter {
   id: string;
   label: string;
   vendor: Vendor;
+  era: Era;
 }
 
 export interface GPUCardData {

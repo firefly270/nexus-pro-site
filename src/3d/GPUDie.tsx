@@ -21,6 +21,7 @@ export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.G
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const prevLit = useRef(new Float32Array(24).fill(-1))
   const tempColor = useMemo(() => new THREE.Color(), [])
+  const prevScroll = useRef(0)
   const { pointer } = useThree()
 
   const smGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.04, 0.1), [])
@@ -60,6 +61,9 @@ export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.G
     const u = IRIDESCENT_MAT.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = s
+    const velocity = Math.abs(s - prevScroll.current)
+    prevScroll.current = s
+    u.uDepth.value = Math.min(velocity * 10, 1)
     u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
 
     for (let i = 0; i < totalSMs; i++) {

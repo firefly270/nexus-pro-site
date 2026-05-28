@@ -153,6 +153,12 @@ function AppContent() {
   useMouseGradient();
 
   useEffect(() => {
+    if (config?.color) {
+      document.documentElement.style.setProperty('--vendor-color', config.color);
+    }
+  }, [config?.color]);
+
+  useEffect(() => {
     const onInteraction = () => {
       AudioEngine.init();
       window.removeEventListener('pointerdown', onInteraction);

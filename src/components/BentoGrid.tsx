@@ -18,7 +18,7 @@ export default function BentoGrid({ cards }: BentoGridProps) {
   const layout = layouts[cards.length] ?? cards.map(() => 'compact')
 
   return (
-    <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="mt-8 grid grid-cols-1 lg:grid-cols-3" style={{ gap: 'var(--era-grid-gap, 16px)' }}>
       {cards.map((card, i) => {
         const role = layout[i] ?? 'compact'
         return (

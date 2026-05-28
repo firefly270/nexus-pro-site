@@ -41,9 +41,13 @@ export default function GPUCard(props: CardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative bg-white/[0.03] border border-white/[0.06] backdrop-blur-xl rounded-2xl animate-fade-up transition-transform duration-300 ease-out overflow-hidden"
+      className="relative backdrop-blur-xl animate-fade-up transition-transform duration-300 ease-out overflow-hidden"
       style={{
-        transform: 'perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))',
+        border: 'var(--era-border, 0.5px solid rgba(255,255,255,0.06))',
+        background: 'var(--era-bg, rgba(255,255,255,0.03))',
+        borderRadius: 'var(--era-radius, 16px)',
+        boxShadow: 'var(--era-card-shadow, none)',
+        transform: 'var(--era-card-transform, none) perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))',
       }}
     >
       <div

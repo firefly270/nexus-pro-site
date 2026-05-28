@@ -38,6 +38,36 @@
   --type-scale-body: clamp(0.875rem, 1.2vw, 1.125rem);
 }
 
+[data-era="blueprint"] {
+  --era-font: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace;
+  --era-border: 1px solid #00FF41;
+  --era-bg: rgba(0, 255, 65, 0.03);
+  --era-radius: 0px;
+  --era-grid-gap: 2px;
+  --era-card-shadow: none;
+  --era-card-transform: none;
+}
+[data-era="acceleration"] {
+  --era-font: var(--font-brand);
+  --era-border: 2px solid var(--vendor-color, #76B900);
+  --era-bg: color-mix(in srgb, var(--vendor-color, #76B900) 5%, transparent);
+  --era-radius: 4px;
+  --era-grid-gap: 6px;
+  --era-card-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --era-card-transform: perspective(800px);
+}
+[data-era="neural"] {
+  --era-font: var(--font-brand);
+  --era-border: 0.5px solid rgba(255,255,255,0.06);
+  --era-bg: transparent;
+  --era-radius: 16px;
+  --era-grid-gap: 16px;
+  --era-card-shadow: none;
+  --era-card-transform: none;
+}
+
+* { transition: font-family 0.8s ease, border 0.8s ease, background 0.8s ease, border-radius 0.8s ease, gap 0.8s ease, box-shadow 0.8s ease; }
+
 [data-theme="light"] {
   color-scheme: light;
 }

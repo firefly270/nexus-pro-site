@@ -21,6 +21,7 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
   const rand = useMemo(() => rng(42), [])
   const prevLit = useRef(new Float32Array(6).fill(-1))
   const { pointer } = useThree()
+  const prevScroll = useRef(0)
 
   const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
 
@@ -79,6 +80,9 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
     const u = IRIDESCENT_MAT.uniforms
     u.uTime.value = state.clock.elapsedTime
     u.uScroll.value = s
+    const velocity = Math.abs(s - prevScroll.current)
+    prevScroll.current = s
+    u.uDepth.value = Math.min(velocity * 10, 1)
     u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
 
     ccdPositions.forEach((_, i) => {
