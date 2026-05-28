@@ -4,6 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as THREE from 'three'
 import { useVendor } from '../context/VendorContext'
+import { usePageVisible } from '../hooks/usePageVisible'
 import GPUDie from './GPUDie'
 import CircuitBoard from './CircuitBoard'
 import DataParticles from './DataParticles'
@@ -14,6 +15,7 @@ import AMDChipletDie from './AMD_ChipletDie'
 import IntelMeshInterconnect from './Intel_MeshInterconnect'
 
 gsap.registerPlugin(ScrollTrigger)
+gsap.ticker.lagSmoothing(0)
 
 const NVIDIA_KEYFRAMES = [
   { t: 0, x: 0, y: 0.5, z: 8, tx: 0, ty: 0, tz: 0 },
@@ -69,6 +71,7 @@ function SceneContent() {
   const { camera } = useThree()
   const progress = useMemo(() => ({ value: 0 }), [])
   const scrollRef = useRef(0)
+  const pageVisible = usePageVisible()
 
   const dieRef = useRef<THREE.Group>(null)
   const amdRef = useRef<THREE.Group>(null)
@@ -93,6 +96,7 @@ function SceneContent() {
   }, [progress])
 
   useFrame(() => {
+    if (!pageVisible.current) return
     const s = progress.value
     scrollRef.current = s
 
@@ -149,7 +153,7 @@ export default function Scene() {
       <Canvas
         camera={{ position: [0, 0.5, 8], fov: 55, near: 0.1, far: 100 }}
         dpr={isMobile ? [1, 1] : [1, 2]}
-        gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}
+        gl={{ antialias: !isMobile, powerPreference: isMobile ? 'default' : 'high-performance' }}
       >
         <SceneContent />
       </Canvas>

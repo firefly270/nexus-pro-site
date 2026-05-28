@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { ReactLenis } from 'lenis/react';
 import { Helmet } from 'react-helmet-async';
 import { VendorProvider, useVendor } from './context/VendorContext';
@@ -10,29 +10,47 @@ import ChapterNav from './components/ChapterNav';
 import MobileNav from './components/MobileNav';
 import OfflineIndicator from './components/OfflineIndicator';
 import ErrorBoundary from './components/ErrorBoundary';
-import ChapterBeginning from './chapters/01-beginning';
-import ChapterShaders from './chapters/02-shaders';
-import ChapterCUDA from './chapters/03-cuda';
-import ChapterMaxwell from './chapters/04-maxwell';
-import ChapterRayTracing from './chapters/05-raytracing';
-import ChapterAI from './chapters/06-ai';
-import ChapterDataCenter from './chapters/06b-datacenter';
-import ChapterArchitecture from './chapters/07-architecture';
-import ChapterFuture from './chapters/08-future';
-import AMDChapter01 from './chapters/amd-01-k5-athlon';
-import AMDChapter02 from './chapters/amd-02-ati-opteron';
-import AMDChapter03 from './chapters/amd-03-dark-times';
-import AMDChapter04 from './chapters/amd-04-ryzen-revival';
-import AMDChapter05 from './chapters/amd-05-rdna-rising';
-import AMDChapter06 from './chapters/amd-06-current-era';
-import AMDChapter07 from './chapters/amd-07-datacenter';
-import IntelChapter01 from './chapters/intel-01-foundations';
-import IntelChapter02 from './chapters/intel-02-pentium-era';
-import IntelChapter03 from './chapters/intel-03-core-i-era';
-import IntelChapter04 from './chapters/intel-04-gpu-attempts';
-import IntelChapter05 from './chapters/intel-05-hybrid-era';
-import IntelChapter06 from './chapters/intel-06-arc-arrow';
-import IntelChapter07 from './chapters/intel-07-xeon';
+
+const ChapterBeginning = lazy(() => import('./chapters/01-beginning'));
+const ChapterShaders = lazy(() => import('./chapters/02-shaders'));
+const ChapterCUDA = lazy(() => import('./chapters/03-cuda'));
+const ChapterMaxwell = lazy(() => import('./chapters/04-maxwell'));
+const ChapterRayTracing = lazy(() => import('./chapters/05-raytracing'));
+const ChapterAI = lazy(() => import('./chapters/06-ai'));
+const ChapterDataCenter = lazy(() => import('./chapters/06b-datacenter'));
+const ChapterArchitecture = lazy(() => import('./chapters/07-architecture'));
+const ChapterFuture = lazy(() => import('./chapters/08-future'));
+const AMDChapter01 = lazy(() => import('./chapters/amd-01-k5-athlon'));
+const AMDChapter02 = lazy(() => import('./chapters/amd-02-ati-opteron'));
+const AMDChapter03 = lazy(() => import('./chapters/amd-03-dark-times'));
+const AMDChapter04 = lazy(() => import('./chapters/amd-04-ryzen-revival'));
+const AMDChapter05 = lazy(() => import('./chapters/amd-05-rdna-rising'));
+const AMDChapter06 = lazy(() => import('./chapters/amd-06-current-era'));
+const AMDChapter07 = lazy(() => import('./chapters/amd-07-datacenter'));
+const IntelChapter01 = lazy(() => import('./chapters/intel-01-foundations'));
+const IntelChapter02 = lazy(() => import('./chapters/intel-02-pentium-era'));
+const IntelChapter03 = lazy(() => import('./chapters/intel-03-core-i-era'));
+const IntelChapter04 = lazy(() => import('./chapters/intel-04-gpu-attempts'));
+const IntelChapter05 = lazy(() => import('./chapters/intel-05-hybrid-era'));
+const IntelChapter06 = lazy(() => import('./chapters/intel-06-arc-arrow'));
+const IntelChapter07 = lazy(() => import('./chapters/intel-07-xeon'));
+
+function ChapterSkeleton() {
+  return (
+    <section className="min-h-screen flex items-center justify-center py-32 px-6">
+      <div className="max-w-4xl mx-auto w-full">
+        <div className="h-4 w-24 bg-zinc-800 rounded animate-pulse mb-6" />
+        <div className="h-12 w-3/4 bg-zinc-800 rounded animate-pulse mb-4" />
+        <div className="h-12 w-1/2 bg-zinc-800 rounded animate-pulse mb-8" />
+        <div className="space-y-3">
+          <div className="h-4 w-full bg-zinc-800/50 rounded animate-pulse" />
+          <div className="h-4 w-5/6 bg-zinc-800/50 rounded animate-pulse" />
+          <div className="h-4 w-4/6 bg-zinc-800/50 rounded animate-pulse" />
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function VendorChapters() {
   const { vendor, isSelected } = useVendor();
@@ -41,7 +59,7 @@ function VendorChapters() {
 
   if (vendor === 'nvidia') {
     return (
-      <>
+      <Suspense fallback={<ChapterSkeleton />}>
         <ErrorBoundary><ChapterBeginning /></ErrorBoundary>
         <ErrorBoundary><ChapterShaders /></ErrorBoundary>
         <ErrorBoundary><ChapterCUDA /></ErrorBoundary>
@@ -51,13 +69,13 @@ function VendorChapters() {
         <ErrorBoundary><ChapterDataCenter /></ErrorBoundary>
         <ErrorBoundary><ChapterArchitecture /></ErrorBoundary>
         <ErrorBoundary><ChapterFuture /></ErrorBoundary>
-      </>
+      </Suspense>
     );
   }
 
   if (vendor === 'amd') {
     return (
-      <>
+      <Suspense fallback={<ChapterSkeleton />}>
         <ErrorBoundary><AMDChapter01 /></ErrorBoundary>
         <ErrorBoundary><AMDChapter02 /></ErrorBoundary>
         <ErrorBoundary><AMDChapter03 /></ErrorBoundary>
@@ -65,13 +83,13 @@ function VendorChapters() {
         <ErrorBoundary><AMDChapter05 /></ErrorBoundary>
         <ErrorBoundary><AMDChapter06 /></ErrorBoundary>
         <ErrorBoundary><AMDChapter07 /></ErrorBoundary>
-      </>
+      </Suspense>
     );
   }
 
   if (vendor === 'intel') {
     return (
-      <>
+      <Suspense fallback={<ChapterSkeleton />}>
         <ErrorBoundary><IntelChapter01 /></ErrorBoundary>
         <ErrorBoundary><IntelChapter02 /></ErrorBoundary>
         <ErrorBoundary><IntelChapter03 /></ErrorBoundary>
@@ -79,7 +97,7 @@ function VendorChapters() {
         <ErrorBoundary><IntelChapter05 /></ErrorBoundary>
         <ErrorBoundary><IntelChapter06 /></ErrorBoundary>
         <ErrorBoundary><IntelChapter07 /></ErrorBoundary>
-      </>
+      </Suspense>
     );
   }
 

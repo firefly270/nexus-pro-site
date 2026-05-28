@@ -50,7 +50,8 @@ export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject
       if (!geo) return
       const totalPts = t.curvePts.length
       const activePts = Math.max(2, Math.floor(totalPts * Math.min(s * 2, 1)))
-      const positions = new Float32Array(totalPts * 3)
+      const posAttr = geo.attributes.position as THREE.BufferAttribute
+      const positions = posAttr.array as Float32Array
       for (let j = 0; j < totalPts; j++) {
         const p = t.curvePts[Math.min(j, activePts - 1)]
         if (p) {
@@ -59,9 +60,7 @@ export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject
           positions[j * 3 + 2] = p.z
         }
       }
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-      const attr = geo.attributes.position
-      if (attr) attr.needsUpdate = true
+      posAttr.needsUpdate = true
     })
   })
 

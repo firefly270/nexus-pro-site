@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import type { GPUCardData, CPUCardData } from '../types'
 import { useVendor } from '../context/VendorContext'
 
@@ -12,17 +12,27 @@ export default function GPUCard(props: CardProps) {
   const accent = config?.accent ?? '#00D4AA'
   const tf = config?.typeface ?? { displayWeight: '900', headingWeight: '700', tracking: '-0.03em' }
   const cardRef = useRef<HTMLDivElement>(null)
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
+    const el = cardRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width - 0.5
     const y = (e.clientY - rect.top) / rect.height - 0.5
-    setTilt({ x: y * -10, y: x * 10 })
+    el.style.setProperty('--tilt-x', `${y * -10}deg`)
+    el.style.setProperty('--tilt-y', `${x * 10}deg`)
+    el.style.setProperty('--glow-x', `${50 + x * 3}%`)
+    el.style.setProperty('--glow-y', `${50 - y * 3}%`)
   }
 
-  const handleMouseLeave = () => setTilt({ x: 0, y: 0 })
+  const handleMouseLeave = () => {
+    const el = cardRef.current
+    if (!el) return
+    el.style.removeProperty('--tilt-x')
+    el.style.removeProperty('--tilt-y')
+    el.style.removeProperty('--glow-x')
+    el.style.removeProperty('--glow-y')
+  }
 
   return (
     <div
@@ -31,13 +41,13 @@ export default function GPUCard(props: CardProps) {
       onMouseLeave={handleMouseLeave}
       className="bg-white/[0.03] border border-white/[0.06] backdrop-blur-xl rounded-2xl p-5 animate-fade-up transition-transform duration-300 ease-out"
       style={{
-        transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transform: 'perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))',
       }}
     >
       <div
         className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: `radial-gradient(600px circle at ${50 + tilt.y * 3}% ${50 - tilt.x * 3}%, ${color}08, transparent 60%)`,
+          background: `radial-gradient(600px circle at var(--glow-x, 50%) var(--glow-y, 50%), ${color}08, transparent 60%)`,
         }}
       />
       <div className="flex items-start justify-between mb-3">

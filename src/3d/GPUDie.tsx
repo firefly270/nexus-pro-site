@@ -13,6 +13,10 @@ const ON_MAT = new THREE.MeshStandardMaterial({ color: '#76B900', emissive: '#76
 
 export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
   const smRefs = useRef<(THREE.Mesh | null)[]>([])
+  const prevLit = useRef(new Float32Array(24).fill(-1))
+
+  const smGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.04, 0.1), [])
+  const wireGeo = useMemo(() => new THREE.BoxGeometry(0.18, 0.01, 0.01), [])
 
   const smPositions = useMemo(() => {
     const pos: [number, number, number][] = []
@@ -30,6 +34,7 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
     const s = scrollRef.current
     const totalSMs = smPositions.length
     const pulse = 0.8 + Math.sin(state.clock.elapsedTime * 3) * 0.4
+    const prev = prevLit.current
 
     ON_MAT.emissiveIntensity = pulse
 
@@ -40,12 +45,11 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
       const centerDist = Math.abs(i - Math.floor(totalSMs / 2)) / Math.floor(totalSMs / 2)
       const threshold = smoothstep(s, 0.1, 0.8)
       const waveDelay = centerDist * 0.15
-      const lit = threshold > waveDelay
+      const lit = threshold > waveDelay ? 1 : 0
 
-      if (lit) {
-        mesh.material = ON_MAT
-      } else {
-        mesh.material = OFF_MAT
+      if (prev[i] !== lit) {
+        prev[i] = lit
+        mesh.material = lit ? ON_MAT : OFF_MAT
       }
     }
   })
@@ -64,7 +68,7 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
           key={i}
           ref={(el) => { smRefs.current[i] = el }}
           position={pos}
-          geometry={new THREE.BoxGeometry(0.1, 0.04, 0.1)}
+          geometry={smGeo}
           material={OFF_MAT}
         />
       ))}
@@ -87,7 +91,7 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
             const z = -0.7 + i * 0.2
             return (
               <mesh key={i} position={[0, 0.02, z]} rotation={[0, 0, xi === 0 ? 0.3 : -0.3]}>
-                <boxGeometry args={[0.18, 0.01, 0.01]} />
+                <primitive object={wireGeo} />
                 <meshBasicMaterial color="#d4a843" />
               </mesh>
             )

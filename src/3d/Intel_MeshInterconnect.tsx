@@ -7,9 +7,11 @@ const ON_TILE = new THREE.MeshStandardMaterial({ color: '#0071C5', emissive: '#0
 
 export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
   const lineRefs = useRef<(THREE.LineSegments | null)[]>([])
+  const prevActive = useRef(new Float32Array(25).fill(-1))
 
   const gridSize = 5
   const spacing = 0.35
+  const tileGeo = useMemo(() => new THREE.BoxGeometry(0.15, 0.04, 0.15), [])
 
   const { tilePositions, meshLines } = useMemo(() => {
     const tiles: [number, number][] = []
@@ -34,15 +36,20 @@ export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollR
     const s = scrollRef.current
     const activeCount = Math.floor(s * tilePositions.length)
     const wave = Math.sin(state.clock.elapsedTime * 2) * 0.5 + 0.5
+    const prev = prevActive.current
 
     ON_TILE.emissiveIntensity = 0.5 + wave * 0.6
 
     tilePositions.forEach((_, i) => {
       const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
       if (!mesh) return
-      mesh.material = i < activeCount ? ON_TILE : OFF_TILE
+      const isOn = i < activeCount ? 1 : 0
+      if (prev[i] !== isOn) {
+        prev[i] = isOn
+        mesh.material = isOn ? ON_TILE : OFF_TILE
+      }
 
-      if (mesh.material === ON_TILE) {
+      if (isOn) {
         const row = Math.floor(i / gridSize)
         const col = i % gridSize
         const dataPhase = Math.sin(state.clock.elapsedTime * 3 + (row + col) * 0.7) * 0.5 + 0.5
@@ -72,7 +79,7 @@ export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollR
 
       {/* Tiles */}
       {tilePositions.map(([x, z], i) => (
-        <mesh key={i} position={[x, 0.03, z]} geometry={new THREE.BoxGeometry(0.15, 0.04, 0.15)} material={OFF_TILE} />
+        <mesh key={i} position={[x, 0.03, z]} geometry={tileGeo} material={OFF_TILE} />
       ))}
 
       {/* Mesh interconnect lines */}

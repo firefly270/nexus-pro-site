@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -11,7 +11,9 @@ const OFF_MAT = new THREE.MeshStandardMaterial({ color: '#1a0505', metalness: 0.
 const ON_MAT = new THREE.MeshStandardMaterial({ color: '#ED1C24', emissive: '#ED1C24', emissiveIntensity: 1.2, metalness: 0.5, roughness: 0.3 })
 
 export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
+  const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
   const rand = useMemo(() => rng(42), [])
+  const prevLit = useRef(new Float32Array(6).fill(-1))
 
   const ccdPositions = useMemo(() => {
     const pos: [number, number, number][] = []
@@ -49,14 +51,19 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
   useFrame((state) => {
     const s = scrollRef.current ?? 0
     const pulse = 0.8 + Math.sin(state.clock.elapsedTime * 2.5) * 0.4
+    const prev = prevLit.current
     ON_MAT.emissiveIntensity = pulse
 
     ccdPositions.forEach((_, i) => {
       const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
       if (!mesh) return
-      mesh.material = i < s * ccdPositions.length ? ON_MAT : OFF_MAT
+      const isOn = i < s * ccdPositions.length ? 1 : 0
+      if (prev[i] !== isOn) {
+        prev[i] = isOn
+        mesh.material = isOn ? ON_MAT : OFF_MAT
+      }
 
-      if (mesh.material === ON_MAT) {
+      if (isOn) {
         const phase = Math.sin(state.clock.elapsedTime * 2 + i * 1.2) * 0.5 + 0.5
         mesh.position.y = 0.03 + phase * 0.015
       } else {
@@ -86,7 +93,7 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
 
       {/* CCD chiplets */}
       {ccdPositions.map((pos, i) => (
-        <mesh key={i} position={pos} geometry={new THREE.BoxGeometry(0.5, 0.06, 0.4)} material={OFF_MAT} />
+        <mesh key={i} position={pos} geometry={ccdGeo} material={OFF_MAT} />
       ))}
 
       {/* IOD glow */}

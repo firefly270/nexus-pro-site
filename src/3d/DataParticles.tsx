@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
+const _mouseVec = new THREE.Vector3()
+
 function rng(seed: number) {
   let s = seed
   return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff }
@@ -41,20 +43,29 @@ export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: 
   const ref = useRef<THREE.Points>(null)
   const { pointer, camera } = useThree()
   const mouseTarget = useRef(new THREE.Vector3())
+  const frameSkip = useRef(0)
+  const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
+  const skipEvery = isMobile ? 3 : 1
 
   const [{ positions, phases }] = useState(() => makeParticles(count))
   const [colors] = useState(() => makeColors(count))
 
   useFrame((state) => {
-    if (!ref.current) return
+    const el = ref.current
+    if (!el) return
+    el.position.z = scrollRef.current * 2
+
+    frameSkip.current = (frameSkip.current + 1) % skipEvery
+    if (frameSkip.current !== 0) return
+
     const s = scrollRef.current
     const speed = 0.3 + s * 0.5
-    const geo = ref.current.geometry
+    const geo = el.geometry
     const pos = geo.attributes.position as THREE.BufferAttribute
     const arr = pos.array as Float32Array
     const phArr = phases as Float32Array
 
-    const mouse3D = new THREE.Vector3(pointer.x, pointer.y, 0.5).unproject(camera)
+    const mouse3D = _mouseVec.set(pointer.x, pointer.y, 0.5).unproject(camera)
     const dir = mouse3D.sub(camera.position).normalize()
     const dist = -camera.position.z / dir.z
     mouseTarget.current.copy(camera.position).add(dir.multiplyScalar(dist))
@@ -80,8 +91,6 @@ export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: 
       }
     }
     pos.needsUpdate = true
-
-    ref.current.position.z = s * 2
   })
 
   return (
