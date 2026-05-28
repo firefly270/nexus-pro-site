@@ -9,7 +9,6 @@ import Navbar from './components/Navbar';
 import Scene from './3d/Scene';
 import Footer from './components/Footer';
 import Hero from './chapters/Hero';
-
 import MobileNav from './components/MobileNav';
 import OfflineIndicator from './components/OfflineIndicator';
 import AccessibleAnnouncer from './components/AccessibleAnnouncer';
