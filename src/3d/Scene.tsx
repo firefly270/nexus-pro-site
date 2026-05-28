@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as THREE from 'three'
 import { useVendor } from '../context/VendorContext'
 import { usePageVisible } from '../hooks/usePageVisible'
-import { mutateTransientState } from '../store/useBoundStore'
+import { mutateTransientState, useBoundStore } from '../store/useBoundStore'
 import GPUDie from './GPUDie'
 import CircuitBoard from './CircuitBoard'
 import DataParticles from './DataParticles'
@@ -27,6 +27,7 @@ function smoothstep(edge0: number, edge1: number, x: number) {
 
 function SceneContent() {
   const { vendor, config } = useVendor()
+  const settings = useBoundStore((s) => s.settings)
   const progress = useMemo(() => ({ value: 0 }), [])
   const scrollRef = useRef(0)
   const pageVisible = usePageVisible()
@@ -76,13 +77,13 @@ function SceneContent() {
 
   const color = config?.color ?? '#76B900'
   const accent = config?.accent ?? '#00D4AA'
-  const bloomIntensity = vendor === 'nvidia' ? 1.0 : vendor === 'amd' ? 0.9 : 0.8
+  const bloomIntensity = settings.bloomIntensity * (vendor === 'nvidia' ? 1.0 : vendor === 'amd' ? 0.9 : 0.8)
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
 
   return (
     <>
       <color attach="background" args={['#030303']} />
-      <fog attach="fog" args={['#030303', 14, 28]} />
+      <fog attach="fog" args={settings.fogEnabled ? ['#030303', 14, 28] : ['#030303', 0, 0]} />
       <CameraSpline />
       <TechBackground scrollRef={scrollRef} />
       <ambientLight intensity={0.3} />
@@ -97,11 +98,11 @@ function SceneContent() {
       )}
       {vendor === 'amd' && <AMDChipletDie groupRef={amdRef} />}
       {vendor === 'intel' && <IntelMeshInterconnect groupRef={intelRef} />}
-      <DataParticles scrollRef={scrollRef} count={isMobile ? 500 : 3000} />
+      <DataParticles scrollRef={scrollRef} count={isMobile ? 500 : Math.round(3000 * settings.particleMultiplier)} />
       <SiliconWafer scrollRef={scrollRef} />
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={bloomIntensity} luminanceThreshold={0.15} luminanceSmoothing={0.85} mipmapBlur />
-        <ChromaticAberration offset={new THREE.Vector2(0.0015, 0.0015)} radialModulation />
+        <ChromaticAberration offset={new THREE.Vector2(settings.caEnabled ? 0.0015 : 0, settings.caEnabled ? 0.0015 : 0)} radialModulation />
         <Vignette eskil={false} offset={0.3} darkness={0.6} />
       </EffectComposer>
     </>
@@ -110,11 +111,12 @@ function SceneContent() {
 
 export default function Scene() {
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
+  const dpr: [number, number] = useBoundStore((s) => isMobile ? [1, 1] : [1, s.settings.dpr])
 
   return (
     <Canvas
       camera={{ position: [0, 0.5, 8], fov: 55, near: 0.1, far: 100 }}
-      dpr={isMobile ? [1, 1] : [1, 2]}
+      dpr={dpr}
       gl={{ antialias: !isMobile, powerPreference: isMobile ? 'default' : 'high-performance' }}
     >
       <SceneContent />

@@ -1,11 +1,14 @@
 import { useMemo, useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useBoundStore } from '../store/useBoundStore'
+import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
-const TILE_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
-const OFF_COLOR = new THREE.Color('#0a0a1a')
-const ON_COLOR = new THREE.Color('#0071C5')
+const OFF_COLOR_STR = '#0a0a1a'
+const ON_COLOR_STR = '#0071C5'
+const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
+const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
+const ON_COLOR = new THREE.Color(ON_COLOR_STR)
 
 export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
@@ -13,6 +16,7 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const prevActive = useRef(new Float32Array(25).fill(-1))
   const tempColor = useMemo(() => new THREE.Color(), [])
+  const { pointer } = useThree()
 
   const gridSize = 5
   const spacing = 0.35
@@ -55,6 +59,11 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
     const prev = prevActive.current
     const mesh = meshRef.current
     if (!mesh) return
+
+    const u = IRIDESCENT_MAT.uniforms
+    u.uTime.value = state.clock.elapsedTime
+    u.uScroll.value = s
+    u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
 
     tilePositions.forEach((_, i) => {
       const isOn = i < activeCount ? 1 : 0
@@ -101,7 +110,7 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
         <meshBasicMaterial color="#0071C5" transparent opacity={0.08} side={THREE.DoubleSide} />
       </mesh>
 
-      <instancedMesh ref={meshRef} args={[tileGeo, TILE_MAT, tilePositions.length]} />
+      <instancedMesh ref={meshRef} args={[tileGeo, IRIDESCENT_MAT, tilePositions.length]} />
 
       {meshLines.map((line, i) => {
         const pts = [

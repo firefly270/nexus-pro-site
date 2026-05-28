@@ -1,22 +1,26 @@
 import { useMemo, useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useBoundStore } from '../store/useBoundStore'
+import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
 function rng(seed: number) {
   let s = seed
   return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff }
 }
 
-const CCD_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
-const OFF_COLOR = new THREE.Color('#1a0505')
-const ON_COLOR = new THREE.Color('#ED1C24')
+const OFF_COLOR_STR = '#1a0505'
+const ON_COLOR_STR = '#ED1C24'
+const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
+const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
+const ON_COLOR = new THREE.Color(ON_COLOR_STR)
 
 export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const rand = useMemo(() => rng(42), [])
   const prevLit = useRef(new Float32Array(6).fill(-1))
+  const { pointer } = useThree()
 
   const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
 
@@ -72,6 +76,11 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
     const mesh = meshRef.current
     if (!mesh) return
 
+    const u = IRIDESCENT_MAT.uniforms
+    u.uTime.value = state.clock.elapsedTime
+    u.uScroll.value = s
+    u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
+
     ccdPositions.forEach((_, i) => {
       const isOn = i < s * ccdPositions.length ? 1 : 0
       if (prev[i] !== isOn) {
@@ -100,7 +109,7 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
         <meshStandardMaterial color="#FF6900" emissive="#FF6900" emissiveIntensity={0.8} metalness={0.5} roughness={0.3} />
       </mesh>
 
-      <instancedMesh ref={meshRef} args={[ccdGeo, CCD_MAT, ccdPositions.length]} />
+      <instancedMesh ref={meshRef} args={[ccdGeo, IRIDESCENT_MAT, ccdPositions.length]} />
 
       <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[2, 1.5]} />

@@ -5,6 +5,9 @@ import type { Vendor } from '../types';
 import ShareButton from './ShareButton';
 import ThemeToggle from './ThemeToggle';
 import AudioToggle from './AudioToggle';
+import { announce } from './AccessibleAnnouncer';
+
+import { AudioEngine } from '../utils/audioManager';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
 
@@ -62,14 +65,30 @@ export default function Navbar() {
     const onClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     };
+    const onEscape = () => setMenuOpen(false);
     document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
+    document.addEventListener('escape-pressed', onEscape);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('escape-pressed', onEscape);
+    };
   }, []);
 
   const label = chapters[current]?.label ?? '';
 
   const switchVendor = (v: Vendor) => {
+    const vc = vendorConfigs[v];
+    AudioEngine.playSwoosh(vendor ? 'down' : 'up');
+    announce(`Switched to ${vc?.label ?? v}`);
     setVendor(v);
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleClearVendor = () => {
+    AudioEngine.playSwoosh('down');
+    announce('Showing all vendors');
+    clearVendor();
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -93,7 +112,7 @@ export default function Navbar() {
           </nav>
           <div className="hidden md:flex items-center gap-1 text-[10px] text-zinc-500 mr-0.5">
             {isSelected && (
-              <span className="truncate max-w-[80px]">{label}</span>
+              <span className="truncate max-w-[80px] animate-breathe-width">{label}</span>
             )}
           </div>
           <div className="flex items-center gap-0.5">
@@ -107,14 +126,14 @@ export default function Navbar() {
                     const vc = vendorConfigs[v];
                     if (!vc) return null;
                     return (
-                      <button key={v} onClick={() => switchVendor(v)} className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] transition-colors ${vendor === v ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}>
+                      <button key={v} onClick={() => switchVendor(v)} className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] transition-all duration-200 ${vendor === v ? 'text-white bg-zinc-800 font-semibold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50 hover:tracking-wide'}`} style={{ fontVariationSettings: vendor === v ? "'wdth' 115" : undefined }}>
                         <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: vc.color }} />
                         {vc.label}
                       </button>
                     );
                   })}
                   {isSelected && (
-                    <button onClick={() => { clearVendor(); setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] text-zinc-500 hover:text-white hover:bg-zinc-800/50 border-t border-zinc-800">
+                    <button onClick={handleClearVendor} className="w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] text-zinc-500 hover:text-white hover:bg-zinc-800/50 hover:tracking-wide border-t border-zinc-800">
                       <span className="text-zinc-600 text-xs">◇</span>
                       All
                     </button>

@@ -1,23 +1,27 @@
 import { useMemo, useRef, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { useBoundStore } from '../store/useBoundStore'
+import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
   return t * t * (3 - 2 * t)
 }
 
-const SM_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
-const OFF_COLOR = new THREE.Color('#0d2d0d')
-const ON_COLOR = new THREE.Color('#76B900')
+const OFF_COLOR_STR = '#0d2d0d'
+const ON_COLOR_STR = '#76B900'
+const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
+const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
+const ON_COLOR = new THREE.Color(ON_COLOR_STR)
 
 export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const prevLit = useRef(new Float32Array(24).fill(-1))
   const tempColor = useMemo(() => new THREE.Color(), [])
+  const { pointer } = useThree()
 
   const smGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.04, 0.1), [])
   const wireGeo = useMemo(() => new THREE.BoxGeometry(0.18, 0.01, 0.01), [])
@@ -53,6 +57,11 @@ export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.G
     const mesh = meshRef.current
     if (!mesh) return
 
+    const u = IRIDESCENT_MAT.uniforms
+    u.uTime.value = state.clock.elapsedTime
+    u.uScroll.value = s
+    u.uMouse.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
+
     for (let i = 0; i < totalSMs; i++) {
       const centerDist = Math.abs(i - Math.floor(totalSMs / 2)) / Math.floor(totalSMs / 2)
       const threshold = smoothstep(s, 0.1, 0.8)
@@ -79,7 +88,7 @@ export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.G
         <meshStandardMaterial color="#0a1a0a" metalness={0.6} roughness={0.4} />
       </mesh>
 
-      <instancedMesh ref={meshRef} args={[smGeo, SM_MAT, smPositions.length]} />
+      <instancedMesh ref={meshRef} args={[smGeo, IRIDESCENT_MAT, smPositions.length]} />
 
       <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[2.2, 2]} />

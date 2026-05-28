@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState } from './store/useBoundStore';
 import { AudioEngine } from './utils/audioManager';
+import { usePerformanceOrchestrator } from './hooks/usePerformanceOrchestrator';
 import Navbar from './components/Navbar';
 import Scene from './3d/Scene';
 import Footer from './components/Footer';
@@ -11,6 +12,7 @@ import Hero from './chapters/Hero';
 import ChapterNav from './components/ChapterNav';
 import MobileNav from './components/MobileNav';
 import OfflineIndicator from './components/OfflineIndicator';
+import AccessibleAnnouncer from './components/AccessibleAnnouncer';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const ChapterBeginning = lazy(() => import('./chapters/01-beginning'));
@@ -109,6 +111,7 @@ function VendorChapters() {
 function useMouseGradient() {
   useEffect(() => {
     let frame: number;
+    let lastScrollY = 0;
     const root = document.documentElement;
     const onMove = (e: MouseEvent) => {
       cancelAnimationFrame(frame);
@@ -117,11 +120,25 @@ function useMouseGradient() {
         const y = (e.clientY / window.innerHeight) * 100;
         root.style.setProperty('--mouse-x', `${x}%`);
         root.style.setProperty('--mouse-y', `${y}%`);
-        mutateTransientState({ mousePosition: [x / 50 - 1, -(y / 50 - 1)] });
+
+        const nx = (e.clientX / window.innerWidth) * 2 - 1;
+        mutateTransientState({ mousePosition: [nx, -(y / 50 - 1)] });
+        if (AudioEngine) AudioEngine.updatePan(nx);
       });
     };
+    const onScroll = () => {
+      const delta = Math.abs(window.scrollY - lastScrollY);
+      lastScrollY = window.scrollY;
+      const velocity = Math.min(delta / 16, 8);
+      AudioEngine.updateFilterVelocity(velocity);
+    };
     window.addEventListener('mousemove', onMove, { passive: true });
-    return () => { window.removeEventListener('mousemove', onMove); cancelAnimationFrame(frame); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 }
 
@@ -132,6 +149,7 @@ function AppContent() {
     ? (config?.heroSubtitle ?? '')
     : 'From pixels to paradigms — processor innovation across three titans of silicon.';
 
+  usePerformanceOrchestrator();
   useMouseGradient();
 
   useEffect(() => {
@@ -146,6 +164,16 @@ function AppContent() {
       window.removeEventListener('pointerdown', onInteraction);
       window.removeEventListener('keydown', onInteraction);
     };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        document.dispatchEvent(new CustomEvent('escape-pressed'))
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
   }, []);
 
   return (
@@ -188,6 +216,7 @@ function AppContent() {
           </div>
           <div className="split-content">
             <Navbar />
+            <AccessibleAnnouncer />
             <OfflineIndicator />
             <main id="main-content" role="main" tabIndex={-1}>
               <div id="scroll-container">

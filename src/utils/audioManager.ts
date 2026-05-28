@@ -3,6 +3,7 @@ class CyberneticAudioManager {
   private master: GainNode | null = null
   private ambientOsc: OscillatorNode | null = null
   private filter: BiquadFilterNode | null = null
+  private pan: StereoPannerNode | null = null
   private initialized = false
 
   init() {
@@ -16,6 +17,7 @@ class CyberneticAudioManager {
 
       this.ambientOsc = this.ctx.createOscillator()
       this.filter = this.ctx.createBiquadFilter()
+      this.pan = this.ctx.createStereoPanner()
 
       this.ambientOsc.type = 'sawtooth'
       this.ambientOsc.frequency.setValueAtTime(55, this.ctx.currentTime)
@@ -24,8 +26,11 @@ class CyberneticAudioManager {
       this.filter.Q.setValueAtTime(4, this.ctx.currentTime)
       this.filter.frequency.setValueAtTime(250, this.ctx.currentTime)
 
+      this.pan.pan.setValueAtTime(0, this.ctx.currentTime)
+
       this.ambientOsc.connect(this.filter)
-      this.filter.connect(this.master)
+      this.filter.connect(this.pan)
+      this.pan.connect(this.master)
       this.ambientOsc.start(0)
 
       this.initialized = true
@@ -74,6 +79,38 @@ class CyberneticAudioManager {
     gain.connect(this.ctx.destination)
     osc.start(now)
     osc.stop(now + 0.04)
+  }
+
+  updatePan(normalizedX: number) {
+    if (!this.pan || !this.ctx) return
+    this.pan.pan.setTargetAtTime(normalizedX, this.ctx.currentTime, 0.15)
+  }
+
+  updateFilterVelocity(velocity: number) {
+    if (!this.filter || !this.ctx) return
+    const cutoff = 200 + Math.min(velocity * 4000, 4000)
+    this.filter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.1)
+  }
+
+  playSwoosh(direction: 'up' | 'down' = 'up') {
+    if (!this.ctx || !this.master || this.master.gain.value === 0) return
+    const now = this.ctx.currentTime
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    const pan = this.ctx.createStereoPanner()
+    osc.type = 'sine'
+    const startFreq = direction === 'up' ? 200 : 800
+    const endFreq = direction === 'up' ? 1200 : 150
+    osc.frequency.setValueAtTime(startFreq, now)
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.15)
+    gain.gain.setValueAtTime(0.04, now)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15)
+    pan.pan.setValueAtTime(Math.random() * 0.6 - 0.3, now)
+    osc.connect(pan)
+    pan.connect(gain)
+    gain.connect(this.ctx.destination)
+    osc.start(now)
+    osc.stop(now + 0.15)
   }
 }
 
