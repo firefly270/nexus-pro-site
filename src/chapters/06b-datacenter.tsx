@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { gpus } from '../constants/gpus'
 
 export default function ChapterDataCenter() {
@@ -11,11 +11,7 @@ export default function ChapterDataCenter() {
         <p>The <strong>B200 Blackwell</strong> continued this trajectory with 208 billion transistors, a dual-die design, and second-gen Transformer Engine supporting FP6 and FP4 precisions. The GB200 NVL72 connected 72 GPUs as one massive accelerator — an "AI factory" in a single rack.</p>
         <p><strong>Blackwell Ultra GB300</strong> pushed further with 288GB of HBM3e memory and 1.5x the AI performance of its predecessor. These chips power the hyperscale cloud — AWS, Azure, Google Cloud — and the GPU-accelerated future of enterprise AI.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {gpus.ch06b!.map((gpu) => (
-          <GPUCard key={gpu.name} {...gpu} />
-        ))}
-      </div>
+      <BentoGrid cards={gpus.ch06b!} />
     </ChapterOverlay>
   )
 }

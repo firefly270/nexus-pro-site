@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { gpus } from '../constants/gpus'
 
 export default function ChapterArchitecture() {
@@ -12,11 +12,7 @@ export default function ChapterArchitecture() {
         <p>The platform includes six additional chips: NVLink 6 Switch (3.6 TB/s), ConnectX-9 SuperNIC, BlueField-4 DPU, Spectrum-6 Ethernet, and Groq 3 LPU. Together they form the VR NVL72 — a complete rack-scale system where 72 Rubin GPUs act as one distributed accelerator.</p>
         <p><strong>Rubin Ultra</strong> (2027) will double performance with dual Rubin dies, reaching 100 PFLOPS and nearly 1TB of HBM4 memory. A full NVL576 rack claims 15 exaflops of FP4 inference — 14x the performance of the Blackwell Ultra generation.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {gpus.ch07!.map((gpu) => (
-          <GPUCard key={gpu.name} {...gpu} />
-        ))}
-      </div>
+      <BentoGrid cards={gpus.ch07!} />
     </ChapterOverlay>
   )
 }

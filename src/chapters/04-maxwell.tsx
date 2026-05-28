@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { gpus } from '../constants/gpus'
 
 export default function ChapterMaxwell() {
@@ -11,11 +11,7 @@ export default function ChapterMaxwell() {
         <p>If Maxwell was brilliant, <strong>Pascal</strong> (GTX 1080 Ti) was legendary. Built on 16nm FinFET, GP102 packed 3584 CUDA cores, 11GB of GDDR5X, and a clock speed that breached 1.5GHz out of the box. The 1080 Ti was the card every gamer wanted and every enthusiast remembers. It remained relevant for years — a testament to how far ahead of its time it was.</p>
         <p>This era cemented NVIDIA's dominance. AMD's GCN architecture couldn't keep up, and NVIDIA had the high-end market entirely to itself.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {gpus.ch04!.map((gpu) => (
-          <GPUCard key={gpu.name} {...gpu} />
-        ))}
-      </div>
+      <BentoGrid cards={gpus.ch04!} />
     </ChapterOverlay>
   )
 }

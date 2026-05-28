@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { amdCards } from '../constants/amd'
 
 export default function AMDChapter04() {
@@ -12,9 +12,7 @@ export default function AMDChapter04() {
         <p>Zen 2 (Ryzen 3000) introduced a <strong>chiplet design</strong> that would define AMD for years: compute dies on 7nm TSMC plus an I/O die on 12nm. This approach allowed AMD to scale from 6-core to 64-core chips using the same building blocks. The Ryzen 9 3950X brought 16 cores to the AM4 socket — something Intel couldn't match.</p>
         <p>The <strong>Ryzen 7 5800X3D</strong> was a technical marvel: 3D V-Cache stacked an extra 64MB of L3 cache on top of the CCD, connected through hybrid bonding. It became the fastest gaming CPU without needing higher clocks or more cores. AMD had out-innovated Intel at every level.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {cards?.map(card => <GPUCard key={card.name} {...card} />)}
-      </div>
+      <BentoGrid cards={cards} />
     </ChapterOverlay>
   )
 }

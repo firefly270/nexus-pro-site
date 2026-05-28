@@ -10,11 +10,11 @@ interface ChapterTextProps {
 export default function ChapterText({ label, title, children, align = 'center' }: ChapterTextProps) {
   const { config } = useVendor()
   const color = config?.color ?? '#76B900'
-  const tf = config?.typeface ?? { displayWeight: '900', headingWeight: '700', tracking: '-0.03em' }
+  const tf = config?.typeface ?? { fontFamily: 'Inter', displayWeight: '900', headingWeight: '700', tracking: '-0.03em' }
   const alignClass = align === 'left' ? 'items-start text-left' : align === 'right' ? 'items-end text-right' : 'items-center text-center'
 
   return (
-    <article className={`flex flex-col ${alignClass} space-y-6 max-w-3xl mx-auto`}>
+    <article className={`flex flex-col ${alignClass} space-y-6`}>
       <span
         className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs"
         style={{ borderColor: `${color}33`, backgroundColor: `${color}0D`, color }}
@@ -28,7 +28,7 @@ export default function ChapterText({ label, title, children, align = 'center' }
       <h2
         className="text-[var(--type-scale-display)] leading-[1.05] tracking-tight text-white"
         style={{
-          fontFamily: 'var(--font-display)',
+          fontFamily: tf.fontFamily,
         }}
       >
         {[...title].map((ch, i) =>
@@ -49,7 +49,7 @@ export default function ChapterText({ label, title, children, align = 'center' }
           )
         )}
       </h2>
-      <div className="text-[var(--type-scale-body)] text-zinc-400 leading-relaxed space-y-4 max-w-2xl">
+      <div className="text-[var(--type-scale-body)] text-zinc-400 leading-relaxed space-y-4 prose-column">
         {children}
       </div>
     </article>

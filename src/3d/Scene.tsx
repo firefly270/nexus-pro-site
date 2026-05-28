@@ -76,11 +76,13 @@ function SceneContent() {
 
   const color = config?.color ?? '#76B900'
   const accent = config?.accent ?? '#00D4AA'
+  const bloomIntensity = vendor === 'nvidia' ? 1.0 : vendor === 'amd' ? 0.9 : 0.8
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
 
   return (
     <>
       <color attach="background" args={['#030303']} />
+      <fog attach="fog" args={['#030303', 14, 28]} />
       <CameraSpline />
       <TechBackground scrollRef={scrollRef} />
       <ambientLight intensity={0.3} />
@@ -97,6 +99,11 @@ function SceneContent() {
       {vendor === 'intel' && <IntelMeshInterconnect groupRef={intelRef} />}
       <DataParticles scrollRef={scrollRef} count={isMobile ? 500 : 3000} />
       <SiliconWafer scrollRef={scrollRef} />
+      <EffectComposer enableNormalPass={false}>
+        <Bloom intensity={bloomIntensity} luminanceThreshold={0.15} luminanceSmoothing={0.85} mipmapBlur />
+        <ChromaticAberration offset={new THREE.Vector2(0.0015, 0.0015)} radialModulation />
+        <Vignette eskil={false} offset={0.3} darkness={0.6} />
+      </EffectComposer>
     </>
   )
 }
@@ -105,19 +112,12 @@ export default function Scene() {
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
 
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas
-        camera={{ position: [0, 0.5, 8], fov: 55, near: 0.1, far: 100 }}
-        dpr={isMobile ? [1, 1] : [1, 2]}
-        gl={{ antialias: !isMobile, powerPreference: isMobile ? 'default' : 'high-performance' }}
-      >
-        <SceneContent />
-        <EffectComposer enableNormalPass={false}>
-          <Bloom intensity={1.0} luminanceThreshold={0.15} luminanceSmoothing={0.85} mipmapBlur />
-          <ChromaticAberration offset={new THREE.Vector2(0.0015, 0.0015)} radialModulation />
-          <Vignette eskil={false} offset={0.3} darkness={0.6} />
-        </EffectComposer>
-      </Canvas>
-    </div>
+    <Canvas
+      camera={{ position: [0, 0.5, 8], fov: 55, near: 0.1, far: 100 }}
+      dpr={isMobile ? [1, 1] : [1, 2]}
+      gl={{ antialias: !isMobile, powerPreference: isMobile ? 'default' : 'high-performance' }}
+    >
+      <SceneContent />
+    </Canvas>
   )
 }

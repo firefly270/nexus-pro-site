@@ -12,7 +12,7 @@ export const vendorConfigs: Record<string, VendorConfig> = {
     description: 'The company that invented the GPU — from NV1 to Blackwell, GeForce to AI factories.',
     heroTitle: 'The GPU Revolution',
     heroSubtitle: 'From pixels to paradigms — 30 years of NVIDIA graphics innovation.',
-    typeface: { displayWeight: '900', headingWeight: '700', tracking: '-0.03em' },
+    typeface: { fontFamily: 'Inter', displayWeight: '900', headingWeight: '700', tracking: '-0.03em' },
   },
   amd: {
     label: 'AMD',
@@ -25,7 +25,7 @@ export const vendorConfigs: Record<string, VendorConfig> = {
     description: 'From K6 to Ryzen, ATI to RDNA — AMD\'s journey of CPU and GPU innovation.',
     heroTitle: 'The AMD Story',
     heroSubtitle: 'From K6 to Ryzen, ATI to RDNA — a tale of two silicon giants in one.',
-    typeface: { displayWeight: '800', headingWeight: '600', tracking: '-0.01em' },
+    typeface: { fontFamily: 'Space Grotesk', displayWeight: '800', headingWeight: '600', tracking: '-0.01em' },
   },
   intel: {
     label: 'Intel',
@@ -38,7 +38,7 @@ export const vendorConfigs: Record<string, VendorConfig> = {
     description: 'From the 4004 to Core Ultra, i740 to Arc — Intel\'s processor and graphics legacy.',
     heroTitle: 'The Intel Journey',
     heroSubtitle: 'From the 4004 to Core Ultra, i740 to Arc — x86 innovation across decades.',
-    typeface: { displayWeight: '700', headingWeight: '500', tracking: '0em' },
+    typeface: { fontFamily: 'Inter', displayWeight: '700', headingWeight: '500', tracking: '0.02em' },
   },
 }
 

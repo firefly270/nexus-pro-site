@@ -41,6 +41,7 @@ export interface CPUCardData {
 export type CardData = GPUCardData | CPUCardData
 
 export interface TypefaceConfig {
+  fontFamily: string
   displayWeight: string
   headingWeight: string
   tracking: string

@@ -40,11 +40,7 @@ export default function Navbar() {
           let found = false;
           for (let i = ranges.length - 1; i >= 0; i--) {
             const r = ranges[i];
-            if (r !== undefined && sy >= r) {
-              setCurrent(i);
-              found = true;
-              break;
-            }
+            if (r !== undefined && sy >= r) { setCurrent(i); found = true; break; }
           }
           if (!found) { setCurrent(0); }
           ticking.current = false;
@@ -79,110 +75,59 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-zinc-800/30 bg-black/70 backdrop-blur-xl" role="banner">
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a
-          href={isSelected ? `#${chapters[0]?.id ?? ''}` : '#vendor-picker'}
-          className="flex items-center gap-2.5 font-bold text-sm text-white tracking-tight shrink-0"
-          aria-label={isSelected ? `Home - ${config?.label}` : 'Choose a vendor'}
-        >
-          <span
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs shadow-lg"
-            style={{ background: `linear-gradient(to tr, ${color}, ${accent})` }}
-            aria-hidden="true"
-          >
-            {config?.icon ?? '◇'}
-          </span>
-          {config?.tagline ?? 'GPU Revolution'}
-        </a>
-
-        <nav aria-label="Chapter quick navigation" className="hidden md:flex items-center gap-1.5">
-          {isSelected && chapters.map((ch, i) => (
-            <a
-              key={ch.id}
-              href={`#${ch.id}`}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === current ? 'scale-125' : 'bg-zinc-700 hover:bg-zinc-500'
-              }`}
-              style={{ backgroundColor: i === current ? color : undefined }}
-              aria-label={`Go to ${ch.label}`}
-              aria-current={i === current ? 'location' : undefined}
-            />
-          ))}
-        </nav>
-
-        <div className="hidden md:flex items-center gap-1 text-xs text-zinc-500 shrink-0" aria-live="polite" aria-atomic="true">
-          {isSelected && (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} aria-hidden="true" />
-              {label}
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1">
-          <div ref={menuRef} className="relative">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-zinc-900/50"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              {isSelected ? config?.label ?? 'Vendor' : 'Vendors'}
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 mt-1 w-40 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
-                {allVendors.map(v => {
-                  const vc = vendorConfigs[v];
-                  if (!vc) return null;
-                  return (
-                    <button
-                      key={v}
-                      onClick={() => switchVendor(v)}
-                      className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-xs transition-colors ${
-                        vendor === v ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                      }`}
-                    >
-                      <span className="w-3 h-3 rounded" style={{ backgroundColor: vc.color }} />
-                      {vc.label}
-                    </button>
-                  );
-                })}
-                {isSelected && (
-                  <button
-                    onClick={() => { clearVendor(); setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                    className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-xs text-zinc-500 hover:text-white hover:bg-zinc-800/50 border-t border-zinc-800"
-                  >
-                    <span className="text-zinc-600">◇</span>
-                    All Vendors
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <AudioToggle />
-          <ShareButton />
-          <ThemeToggle />
-        </div>
-      </div>
-
+    <>
       {isSelected && (
-        <div className="h-0.5 bg-zinc-800/50 relative" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Page progress">
-          <div
-            className="h-full transition-all duration-150 ease-out relative"
-            style={{ width: `${progress * 100}%`, background: `linear-gradient(to right, ${color}, ${accent})` }}
-          >
-            <div
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
-              style={{
-                backgroundColor: accent,
-                boxShadow: `0 0 8px ${accent}`,
-              }}
-            />
-          </div>
+        <div className="fixed top-0 left-0 right-0 z-[60] h-[1px] pointer-events-none" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Page progress">
+          <div className="h-full transition-all duration-150 ease-out" style={{ width: `${progress * 100}%`, background: `linear-gradient(to right, ${color}, ${accent})` }} />
         </div>
       )}
-    </header>
+      <header className="fixed top-3 right-3 z-50" role="banner">
+        <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-xl border border-white/[0.06] rounded-full px-2.5 py-1.5 shadow-lg">
+          <a href={isSelected ? `#${chapters[0]?.id ?? ''}` : '#vendor-picker'} className="flex items-center gap-1.5 text-white shrink-0" aria-label={isSelected ? `Home - ${config?.label}` : 'Choose a vendor'}>
+            <span className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] shadow" style={{ background: `linear-gradient(135deg, ${color}, ${accent})` }} aria-hidden="true">{config?.icon ?? '◇'}</span>
+          </a>
+          <nav aria-label="Chapter quick navigation" className="hidden md:flex items-center gap-1">
+            {isSelected && chapters.slice(0, 8).map((ch, i) => (
+              <a key={ch.id} href={`#${ch.id}`} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === current ? 'scale-125' : 'bg-zinc-700 hover:bg-zinc-500'}`} style={{ backgroundColor: i === current ? color : undefined, boxShadow: i === current ? `0 0 4px ${color}` : undefined }} aria-label={`Go to ${ch.label}`} aria-current={i === current ? 'location' : undefined} />
+            ))}
+          </nav>
+          <div className="hidden md:flex items-center gap-1 text-[10px] text-zinc-500 mr-0.5">
+            {isSelected && (
+              <span className="truncate max-w-[80px]">{label}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-0.5">
+            <div ref={menuRef} className="relative">
+              <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center justify-center w-5 h-5 text-zinc-500 hover:text-zinc-300 transition-colors rounded-full hover:bg-zinc-800/50" aria-label="Switch vendor">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-1.5 w-36 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
+                  {allVendors.map(v => {
+                    const vc = vendorConfigs[v];
+                    if (!vc) return null;
+                    return (
+                      <button key={v} onClick={() => switchVendor(v)} className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] transition-colors ${vendor === v ? 'text-white bg-zinc-800' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}>
+                        <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: vc.color }} />
+                        {vc.label}
+                      </button>
+                    );
+                  })}
+                  {isSelected && (
+                    <button onClick={() => { clearVendor(); setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] text-zinc-500 hover:text-white hover:bg-zinc-800/50 border-t border-zinc-800">
+                      <span className="text-zinc-600 text-xs">◇</span>
+                      All
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <AudioToggle />
+            <ShareButton />
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+    </>
   );
 }

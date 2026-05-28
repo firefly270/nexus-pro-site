@@ -38,6 +38,17 @@ void main() {
   col += vec3(0.4, 0.75, 0.1) * scanline * 0.03;
   col += vec3(0.46, 0.73, 0.0) * noise * 0.02 * (1.0 - uProgress * 0.5);
   
+  float wave1 = sin(vUv.x * 8.0 + uTime * 0.3) * 0.5 + 0.5;
+  float wave2 = cos(vUv.y * 6.0 + uTime * 0.4 + uProgress * 3.0) * 0.5 + 0.5;
+  float wave3 = sin((vUv.x + vUv.y) * 5.0 + uTime * 0.25 + uProgress * 2.0) * 0.5 + 0.5;
+  float energyWave = (wave1 * 0.3 + wave2 * 0.3 + wave3 * 0.4) * uProgress * 0.15;
+  col += (mix(uColor1, uColor2, 0.5)) * energyWave * 0.02;
+  
+  float ring = distance(vUv, vec2(0.5 + sin(uTime * 0.1) * 0.1, 0.5 + cos(uTime * 0.08) * 0.1));
+  float ringGlow = sin(ring * 30.0 - uTime * 0.5 + uProgress * 2.0) * 0.5 + 0.5;
+  ringGlow = smoothstep(0.4, 0.8, ringGlow) * 0.04 * uProgress;
+  col += vec3(0.3, 0.5, 0.3) * ringGlow;
+  
   gl_FragColor = vec4(col, 1.0);
 }
 `

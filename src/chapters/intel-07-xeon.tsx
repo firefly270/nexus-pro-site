@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { intelCards } from '../constants/intel'
 
 export default function IntelChapter07() {
@@ -12,9 +12,7 @@ export default function IntelChapter07() {
         <p><strong>Granite Rapids</strong> (Xeon 6, 2024) was Intel's answer to AMD's EPYC Genoa: 128 Performance-cores with 256 threads, 12-channel DDR5-6400 memory, 96 lanes of PCIe 5.0, and built-in AMX (Advanced Matrix Extensions) for AI inference acceleration. In the data center, Intel still commands ~75% market share despite AMD's gains.</p>
         <p>Intel's data center strategy now spans CPUs (Xeon), GPUs (Arc Flex for media, Arc Pro for visualization), and AI accelerators (Gaudi 3, upcoming Falcon Shores). The company that invented the microprocessor is betting on a heterogeneous computing future where CPUs, GPUs, and NPUs work together — not unlike the fusion AMD envisioned two decades ago.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {cards?.map(card => <GPUCard key={card.name} {...card} />)}
-      </div>
+      <BentoGrid cards={cards} />
     </ChapterOverlay>
   )
 }

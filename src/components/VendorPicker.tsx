@@ -1,8 +1,59 @@
-import type { Vendor } from '../types';
+import { useRef } from 'react';
+import type { Vendor, VendorConfig } from '../types';
 import { vendorConfigs, vendorChapters } from '../constants/vendors';
 import { useVendor } from '../context/VendorContext';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
+
+function VendorCard({ v: _v, vc, onSelect }: { v: Vendor; vc: VendorConfig; onSelect: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width * 100;
+    const y = (e.clientY - rect.top) / rect.height * 100;
+    el.style.setProperty('--glow-x', `${x}%`);
+    el.style.setProperty('--glow-y', `${y}%`);
+  };
+
+  const handleMouseLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.removeProperty('--glow-x');
+    el.style.removeProperty('--glow-y');
+  };
+
+  return (
+    <button
+      ref={ref}
+      onClick={onSelect}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group relative text-left bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.15] backdrop-blur-xl rounded-2xl p-7 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
+    >
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{ backgroundColor: vc.color }} />
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: `radial-gradient(400px circle at var(--glow-x, 50%) var(--glow-y, 50%), ${vc.color}15, transparent 60%)`,
+        }}
+      />
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500 pointer-events-none" style={{ backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 1px, ${vc.color} 1px, ${vc.color} 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, ${vc.color} 1px, ${vc.color} 2px)`, backgroundSize: '12px 12px' }} />
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center text-lg mb-4 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl relative"
+        style={{ background: `linear-gradient(135deg, ${vc.color}, ${vc.accent})` }}
+      >
+        {vc.icon}
+        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ boxShadow: `inset 0 0 20px ${vc.color}40, 0 0 15px ${vc.color}20` }} />
+      </div>
+      <h3 className="text-white font-bold text-lg mb-1">{vc.label}</h3>
+      <p className="text-xs font-medium mb-2" style={{ color: vc.color }}>{vc.tagline}</p>
+      <p className="text-zinc-500 text-xs leading-relaxed">{vc.description}</p>
+    </button>
+  );
+}
 
 export default function VendorPicker() {
   const { setVendor } = useVendor();
@@ -20,7 +71,7 @@ export default function VendorPicker() {
   };
 
   return (
-    <section id="vendor-picker" className="relative min-h-screen flex items-center justify-center py-32 md:py-40 overflow-hidden scroll-mt-14">
+    <section id="vendor-picker" className="relative min-h-screen flex items-center justify-center py-32 md:py-40 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-700/50 bg-zinc-900/30 text-xs text-zinc-400 mb-6 animate-fade-up">
           A 3D Scrollytelling Experience
@@ -42,27 +93,7 @@ export default function VendorPicker() {
           {allVendors.map(v => {
             const vc = vendorConfigs[v];
             if (!vc) return null;
-            return (
-              <button
-                key={v}
-                onClick={() => selectVendor(v)}
-                className="group relative text-left bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.15] backdrop-blur-xl rounded-2xl p-7 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
-              >
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                  style={{ backgroundColor: vc.color }}
-                />
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-lg mb-4 shadow-lg transition-transform group-hover:scale-110"
-                  style={{ background: `linear-gradient(135deg, ${vc.color}, ${vc.accent})` }}
-                >
-                  {vc.icon}
-                </div>
-                <h3 className="text-white font-bold text-lg mb-1">{vc.label}</h3>
-                <p className="text-xs font-medium mb-2" style={{ color: vc.color }}>{vc.tagline}</p>
-                <p className="text-zinc-500 text-xs leading-relaxed">{vc.description}</p>
-              </button>
-            );
+            return <VendorCard key={v} v={v} vc={vc} onSelect={() => selectVendor(v)} />;
           })}
         </div>
       </div>

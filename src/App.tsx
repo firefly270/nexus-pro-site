@@ -182,16 +182,22 @@ function AppContent() {
           })}</script>
         </Helmet>
         <a href="#main-content" className="skip-to-content">Skip to content</a>
-        <Scene key={vendor ?? 'picker'} />
-        <Navbar />
-        <OfflineIndicator />
-        <main id="main-content" role="main" tabIndex={-1}>
-          <div id="scroll-container">
-            <Hero />
-            <VendorChapters />
+        <div className="split-root">
+          <div className="split-canvas">
+            <Scene key={vendor ?? 'picker'} />
           </div>
-        </main>
-        <Footer />
+          <div className="split-content">
+            <Navbar />
+            <OfflineIndicator />
+            <main id="main-content" role="main" tabIndex={-1}>
+              <div id="scroll-container">
+                <Hero />
+                <VendorChapters />
+              </div>
+            </main>
+            <Footer />
+          </div>
+        </div>
         <ChapterNav />
         <MobileNav />
       </div>

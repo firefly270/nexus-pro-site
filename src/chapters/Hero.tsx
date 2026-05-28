@@ -9,7 +9,7 @@ function VendorHero() {
   const accent = config?.accent ?? '#00D4AA';
 
   return (
-    <section id="vendor-hero" ref={ref} className="relative min-h-screen flex items-center justify-center py-32 md:py-40 overflow-hidden scroll-mt-14">
+    <section id="vendor-hero" ref={ref} className="relative min-h-screen flex items-center justify-center py-32 md:py-40 overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
         <div
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs mb-6 ${vis ? 'animate-fade-up' : 'opacity-0'}`}

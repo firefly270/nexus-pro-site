@@ -1,6 +1,6 @@
 import ChapterOverlay from '../components/ChapterOverlay'
 import ChapterText from '../components/ChapterText'
-import GPUCard from '../components/GPUCard'
+import BentoGrid from '../components/BentoGrid'
 import { amdCards } from '../constants/amd'
 
 export default function AMDChapter07() {
@@ -12,9 +12,7 @@ export default function AMDChapter07() {
         <p>The <strong>AMD Instinct MI300X</strong> is AMD's most ambitious chip ever: 146 billion transistors across 13 chiplets, 192GB of HBM3 memory, and CDNA 3 architecture designed for large language model training. It competes directly with NVIDIA's H100 and B200 in the AI data center.</p>
         <p>With the unified ROCm software stack and Infinity Architecture connecting EPYC CPUs to Instinct GPUs over coherent memory fabrics, AMD offers the industry's only CPU+GPU platform under one roof. The bet Dr. Su made in 2014 — that AMD's integration of CPU and GPU expertise would win — has finally paid off.</p>
       </ChapterText>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {cards?.map(card => <GPUCard key={card.name} {...card} />)}
-      </div>
+      <BentoGrid cards={cards} />
     </ChapterOverlay>
   )
 }
