@@ -74,6 +74,12 @@
   }
 }
 
+@keyframes segment-glow {
+  0% { box-shadow: 0 0 0px var(--seg-color, #00D4AA); }
+  50% { box-shadow: 0 0 6px var(--seg-color, #00D4AA); }
+  100% { box-shadow: 0 0 0px var(--seg-color, #00D4AA); }
+}
+
 @media (prefers-reduced-data: reduce) {
   .animate-cinematic,
   .animate-weight-reveal,
