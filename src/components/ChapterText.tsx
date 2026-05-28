@@ -26,16 +26,28 @@ export default function ChapterText({ label, title, children, align = 'center' }
         {label}
       </span>
       <h2
-        className="text-[var(--type-scale-display)] leading-[1.05] tracking-tight text-white animate-weight-reveal"
+        className="text-[var(--type-scale-display)] leading-[1.05] tracking-tight text-white"
         style={{
           fontFamily: 'var(--font-display)',
-          fontWeight: tf.displayWeight,
-          letterSpacing: tf.tracking,
-          '--dw': tf.displayWeight,
-          '--dt': tf.tracking,
-        } as React.CSSProperties}
+        }}
       >
-        {title}
+        {[...title].map((ch, i) =>
+          ch === ' ' ? (
+            <span key={i} className="inline-block w-[0.3em]" />
+          ) : (
+            <span
+              key={i}
+              className="inline-block animate-weight-reveal-char"
+              style={{
+                '--char-index': i,
+                '--dw': tf.displayWeight,
+                '--dt': tf.tracking,
+              } as React.CSSProperties}
+            >
+              {ch}
+            </span>
+          )
+        )}
       </h2>
       <div className="text-[var(--type-scale-body)] text-zinc-400 leading-relaxed space-y-4 max-w-2xl">
         {children}

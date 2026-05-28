@@ -1,13 +1,18 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useBoundStore } from '../store/useBoundStore'
 
-const OFF_TILE = new THREE.MeshStandardMaterial({ color: '#0a0a1a', metalness: 0.3, roughness: 0.7 })
-const ON_TILE = new THREE.MeshStandardMaterial({ color: '#0071C5', emissive: '#0071C5', emissiveIntensity: 0.8, metalness: 0.5, roughness: 0.3 })
+const TILE_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
+const OFF_COLOR = new THREE.Color('#0a0a1a')
+const ON_COLOR = new THREE.Color('#0071C5')
 
-export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
+export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
   const lineRefs = useRef<(THREE.LineSegments | null)[]>([])
+  const dummy = useMemo(() => new THREE.Object3D(), [])
   const prevActive = useRef(new Float32Array(25).fill(-1))
+  const tempColor = useMemo(() => new THREE.Color(), [])
 
   const gridSize = 5
   const spacing = 0.35
@@ -20,7 +25,6 @@ export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollR
         tiles.push([(c - Math.floor(gridSize / 2)) * spacing, (r - Math.floor(gridSize / 2)) * spacing])
       }
     }
-
     const lines: { start: [number, number]; end: [number, number] }[] = []
     for (let r = 0; r < gridSize; r++) {
       for (let c = 0; c < gridSize; c++) {
@@ -28,36 +32,57 @@ export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollR
         if (r < gridSize - 1) lines.push({ start: tiles[r * gridSize + c]!, end: tiles[(r + 1) * gridSize + c]! })
       }
     }
-
     return { tilePositions: tiles, meshLines: lines }
   }, [])
 
+  useEffect(() => {
+    if (!meshRef.current) return
+    tilePositions.forEach(([x, z], i) => {
+      dummy.position.set(x, 0.03, z)
+      dummy.scale.set(1, 1, 1)
+      dummy.updateMatrix()
+      meshRef.current!.setMatrixAt(i, dummy.matrix)
+      meshRef.current!.setColorAt(i, OFF_COLOR)
+    })
+    meshRef.current.instanceMatrix.needsUpdate = true
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true
+  }, [tilePositions, dummy])
+
   useFrame((state) => {
-    const s = scrollRef.current
+    const s = useBoundStore.getState().transient.scrollProgress
     const activeCount = Math.floor(s * tilePositions.length)
     const wave = Math.sin(state.clock.elapsedTime * 2) * 0.5 + 0.5
     const prev = prevActive.current
-
-    ON_TILE.emissiveIntensity = 0.5 + wave * 0.6
+    const mesh = meshRef.current
+    if (!mesh) return
 
     tilePositions.forEach((_, i) => {
-      const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
-      if (!mesh) return
       const isOn = i < activeCount ? 1 : 0
       if (prev[i] !== isOn) {
         prev[i] = isOn
-        mesh.material = isOn ? ON_TILE : OFF_TILE
+        if (isOn) {
+          tempColor.copy(ON_COLOR).lerp(new THREE.Color('#ffffff'), wave * 0.2)
+          mesh.setColorAt(i, tempColor)
+        } else {
+          mesh.setColorAt(i, OFF_COLOR)
+        }
       }
-
       if (isOn) {
         const row = Math.floor(i / gridSize)
         const col = i % gridSize
         const dataPhase = Math.sin(state.clock.elapsedTime * 3 + (row + col) * 0.7) * 0.5 + 0.5
-        mesh.position.y = 0.03 + dataPhase * 0.012
-      } else {
-        mesh.position.y = 0.03
+        dummy.position.set(
+          tilePositions[i]![0],
+          0.03 + dataPhase * 0.012,
+          tilePositions[i]![1],
+        )
+        dummy.scale.set(1, 1, 1)
+        dummy.updateMatrix()
+        mesh.setMatrixAt(i, dummy.matrix)
       }
     })
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
 
     lineRefs.current.forEach((line, i) => {
       if (!line) return
@@ -71,18 +96,13 @@ export default function IntelMeshInterconnect({ scrollRef, groupRef }: { scrollR
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* Ring bus circle */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <ringGeometry args={[spacing * 2.5, spacing * 2.7, 64]} />
         <meshBasicMaterial color="#0071C5" transparent opacity={0.08} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Tiles */}
-      {tilePositions.map(([x, z], i) => (
-        <mesh key={i} position={[x, 0.03, z]} geometry={tileGeo} material={OFF_TILE} />
-      ))}
+      <instancedMesh ref={meshRef} args={[tileGeo, TILE_MAT, tilePositions.length]} />
 
-      {/* Mesh interconnect lines */}
       {meshLines.map((line, i) => {
         const pts = [
           new THREE.Vector3(line.start[0], 0.02, line.start[1]),

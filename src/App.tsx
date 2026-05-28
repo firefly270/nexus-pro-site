@@ -1,7 +1,9 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { ReactLenis } from 'lenis/react';
 import { Helmet } from 'react-helmet-async';
 import { VendorProvider, useVendor } from './context/VendorContext';
+import { mutateTransientState } from './store/useBoundStore';
+import { AudioEngine } from './utils/audioManager';
 import Navbar from './components/Navbar';
 import Scene from './3d/Scene';
 import Footer from './components/Footer';
@@ -105,19 +107,22 @@ function VendorChapters() {
 }
 
 function useMouseGradient() {
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   useEffect(() => {
     let frame: number;
+    const root = document.documentElement;
     const onMove = (e: MouseEvent) => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        setPos({ x: (e.clientX / window.innerWidth) * 100, y: (e.clientY / window.innerHeight) * 100 });
+        const x = (e.clientX / window.innerWidth) * 100;
+        const y = (e.clientY / window.innerHeight) * 100;
+        root.style.setProperty('--mouse-x', `${x}%`);
+        root.style.setProperty('--mouse-y', `${y}%`);
+        mutateTransientState({ mousePosition: [x / 50 - 1, -(y / 50 - 1)] });
       });
     };
     window.addEventListener('mousemove', onMove, { passive: true });
     return () => { window.removeEventListener('mousemove', onMove); cancelAnimationFrame(frame); };
   }, []);
-  return pos;
 }
 
 function AppContent() {
@@ -127,7 +132,21 @@ function AppContent() {
     ? (config?.heroSubtitle ?? '')
     : 'From pixels to paradigms — processor innovation across three titans of silicon.';
 
-  const mouseRef = useMouseGradient();
+  useMouseGradient();
+
+  useEffect(() => {
+    const onInteraction = () => {
+      AudioEngine.init();
+      window.removeEventListener('pointerdown', onInteraction);
+      window.removeEventListener('keydown', onInteraction);
+    };
+    window.addEventListener('pointerdown', onInteraction, { once: true });
+    window.addEventListener('keydown', onInteraction, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', onInteraction);
+      window.removeEventListener('keydown', onInteraction);
+    };
+  }, []);
 
   return (
     <ReactLenis root options={{ duration: 1.2, smoothWheel: true }}>
@@ -135,9 +154,7 @@ function AppContent() {
         <div
           className="fixed inset-0 pointer-events-none -z-[5] opacity-30 transition-opacity duration-500"
           style={{
-            background: mouseRef
-              ? `radial-gradient(800px circle at ${mouseRef.x}% ${mouseRef.y}%, ${config?.color ?? '#76B900'}08, transparent 60%)`
-              : 'none',
+            background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${config?.color ?? '#76B900'}08, transparent 60%)`,
           }}
         />
         <Helmet>
@@ -153,10 +170,15 @@ function AppContent() {
           <meta name="twitter:card" content="summary_large_image" />
           <script type="application/ld+json">{JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'Article',
+            '@type': 'TechArticle',
             headline: title,
             description: desc,
             author: { '@type': 'Organization', name: 'The Silicon Revolution' },
+            about: {
+              '@type': 'Thing',
+              name: 'Graphics processing unit history',
+              description: 'The evolution of GPU and CPU architecture across NVIDIA, AMD, and Intel',
+            },
           })}</script>
         </Helmet>
         <a href="#main-content" className="skip-to-content">Skip to content</a>

@@ -4,6 +4,7 @@ import { vendorConfigs } from '../constants/vendors';
 import type { Vendor } from '../types';
 import ShareButton from './ShareButton';
 import ThemeToggle from './ThemeToggle';
+import AudioToggle from './AudioToggle';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
 
@@ -160,6 +161,7 @@ export default function Navbar() {
               </div>
             )}
           </div>
+          <AudioToggle />
           <ShareButton />
           <ThemeToggle />
         </div>

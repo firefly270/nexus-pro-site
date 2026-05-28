@@ -14,6 +14,10 @@
   0% { font-weight: 200; letter-spacing: -0.05em; opacity: 0; transform: translateY(20px); }
   100% { font-weight: var(--dw, 900); letter-spacing: var(--dt, -0.03em); opacity: 1; transform: translateY(0); }
 }
+@keyframes weight-reveal-char {
+  0% { font-weight: 200; letter-spacing: -0.05em; opacity: 0; transform: translateY(20px); }
+  100% { font-weight: var(--dw, 900); letter-spacing: var(--dt, -0.03em); opacity: 1; transform: translateY(0); }
+}
 @keyframes stagger-up {
   0% { opacity: 0; transform: translateY(16px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -27,6 +31,10 @@
 .animate-fade-in { animation: fade-in 0.6s ease-out both; }
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-weight-reveal { animation: weight-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-weight-reveal-char {
+  animation: weight-reveal-char 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--char-index) * 40ms);
+}
 .animate-stagger-up { animation: stagger-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-cinematic { animation: cinematic-in 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
@@ -40,6 +48,7 @@
   .animate-fade-in,
   .animate-float,
   .animate-weight-reveal,
+  .animate-weight-reveal-char,
   .animate-stagger-up,
   .animate-cinematic,
   .chapter-fade {
@@ -54,6 +63,7 @@
 @media (prefers-reduced-data: reduce) {
   .animate-cinematic,
   .animate-weight-reveal,
+  .animate-weight-reveal-char,
   .animate-stagger-up {
     animation: none !important;
     opacity: 1 !important;

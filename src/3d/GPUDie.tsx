@@ -1,19 +1,23 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
+import { useBoundStore } from '../store/useBoundStore'
 
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
   return t * t * (3 - 2 * t)
 }
 
-const OFF_MAT = new THREE.MeshStandardMaterial({ color: '#0d2d0d', metalness: 0.3, roughness: 0.7 })
-const ON_MAT = new THREE.MeshStandardMaterial({ color: '#76B900', emissive: '#76B900', emissiveIntensity: 1.2, metalness: 0.5, roughness: 0.3 })
+const SM_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
+const OFF_COLOR = new THREE.Color('#0d2d0d')
+const ON_COLOR = new THREE.Color('#76B900')
 
-export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
-  const smRefs = useRef<(THREE.Mesh | null)[]>([])
+export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
+  const dummy = useMemo(() => new THREE.Object3D(), [])
   const prevLit = useRef(new Float32Array(24).fill(-1))
+  const tempColor = useMemo(() => new THREE.Color(), [])
 
   const smGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.04, 0.1), [])
   const wireGeo = useMemo(() => new THREE.BoxGeometry(0.18, 0.01, 0.01), [])
@@ -22,26 +26,34 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
     const pos: [number, number, number][] = []
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 4; col++) {
-        const x = (col - 1.5) * 0.3
-        const z = (row - 2.5) * 0.3
-        pos.push([x, 0.03, z])
+        pos.push([(col - 1.5) * 0.3, 0.03, (row - 2.5) * 0.3])
       }
     }
     return pos
   }, [])
 
-  useFrame((state) => {
-    const s = scrollRef.current
-    const totalSMs = smPositions.length
-    const pulse = 0.8 + Math.sin(state.clock.elapsedTime * 3) * 0.4
-    const prev = prevLit.current
+  useEffect(() => {
+    if (!meshRef.current) return
+    smPositions.forEach(([x, y, z], i) => {
+      dummy.position.set(x, y, z)
+      dummy.scale.set(1, 1, 1)
+      dummy.updateMatrix()
+      meshRef.current!.setMatrixAt(i, dummy.matrix)
+      meshRef.current!.setColorAt(i, OFF_COLOR)
+    })
+    meshRef.current.instanceMatrix.needsUpdate = true
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true
+  }, [smPositions, dummy])
 
-    ON_MAT.emissiveIntensity = pulse
+  useFrame((state) => {
+    const s = useBoundStore.getState().transient.scrollProgress
+    const totalSMs = smPositions.length
+    const pulse = 0.7 + Math.sin(state.clock.elapsedTime * 3) * 0.3
+    const prev = prevLit.current
+    const mesh = meshRef.current
+    if (!mesh) return
 
     for (let i = 0; i < totalSMs; i++) {
-      const mesh = smRefs.current[i]
-      if (!mesh) continue
-
       const centerDist = Math.abs(i - Math.floor(totalSMs / 2)) / Math.floor(totalSMs / 2)
       const threshold = smoothstep(s, 0.1, 0.8)
       const waveDelay = centerDist * 0.15
@@ -49,42 +61,35 @@ export default function GPUDie({ scrollRef, groupRef }: { scrollRef: React.RefOb
 
       if (prev[i] !== lit) {
         prev[i] = lit
-        mesh.material = lit ? ON_MAT : OFF_MAT
+        if (lit) {
+          tempColor.copy(ON_COLOR).multiplyScalar(pulse)
+          mesh.setColorAt(i, tempColor)
+        } else {
+          mesh.setColorAt(i, OFF_COLOR)
+        }
       }
     }
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
   })
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* Die substrate */}
       <mesh>
         <boxGeometry args={[1.8, 0.08, 1.6]} />
         <meshStandardMaterial color="#0a1a0a" metalness={0.6} roughness={0.4} />
       </mesh>
 
-      {/* SM units */}
-      {smPositions.map((pos, i) => (
-        <mesh
-          key={i}
-          ref={(el) => { smRefs.current[i] = el }}
-          position={pos}
-          geometry={smGeo}
-          material={OFF_MAT}
-        />
-      ))}
+      <instancedMesh ref={meshRef} args={[smGeo, SM_MAT, smPositions.length]} />
 
-      {/* Glow plane under die */}
       <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[2.2, 2]} />
         <meshBasicMaterial color="#76B900" transparent opacity={0.06} />
       </mesh>
 
-      {/* NVIDIA text */}
       <Text position={[0, 0.06, 0.7]} fontSize={0.12} color="#ffffff" anchorX="center" anchorY="middle" fontWeight={700}>
         NVIDIA
       </Text>
 
-      {/* Wire bonds */}
       {[-0.85, 0.85].map((x, xi) => (
         <group key={xi} position={[x, 0, 0]}>
           {Array.from({ length: 8 }, (_, i) => {

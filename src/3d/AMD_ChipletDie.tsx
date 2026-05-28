@@ -1,19 +1,24 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useBoundStore } from '../store/useBoundStore'
 
 function rng(seed: number) {
   let s = seed
   return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff }
 }
 
-const OFF_MAT = new THREE.MeshStandardMaterial({ color: '#1a0505', metalness: 0.3, roughness: 0.7 })
-const ON_MAT = new THREE.MeshStandardMaterial({ color: '#ED1C24', emissive: '#ED1C24', emissiveIntensity: 1.2, metalness: 0.5, roughness: 0.3 })
+const CCD_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.4, roughness: 0.4 })
+const OFF_COLOR = new THREE.Color('#1a0505')
+const ON_COLOR = new THREE.Color('#ED1C24')
 
-export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: React.RefObject<number>; groupRef: React.RefObject<THREE.Group | null> }) {
-  const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
+export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
+  const dummy = useMemo(() => new THREE.Object3D(), [])
   const rand = useMemo(() => rng(42), [])
   const prevLit = useRef(new Float32Array(6).fill(-1))
+
+  const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
 
   const ccdPositions = useMemo(() => {
     const pos: [number, number, number][] = []
@@ -24,6 +29,19 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
     }
     return pos
   }, [])
+
+  useEffect(() => {
+    if (!meshRef.current) return
+    ccdPositions.forEach(([x, y, z], i) => {
+      dummy.position.set(x, y, z)
+      dummy.scale.set(1, 1, 1)
+      dummy.updateMatrix()
+      meshRef.current!.setMatrixAt(i, dummy.matrix)
+      meshRef.current!.setColorAt(i, OFF_COLOR)
+    })
+    meshRef.current.instanceMatrix.needsUpdate = true
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true
+  }, [ccdPositions, dummy])
 
   const ifLines = useMemo(() => {
     const lines: THREE.Line[] = []
@@ -49,27 +67,19 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
   }, [ccdPositions, rand])
 
   useFrame((state) => {
-    const s = scrollRef.current ?? 0
-    const pulse = 0.8 + Math.sin(state.clock.elapsedTime * 2.5) * 0.4
+    const s = useBoundStore.getState().transient.scrollProgress
     const prev = prevLit.current
-    ON_MAT.emissiveIntensity = pulse
+    const mesh = meshRef.current
+    if (!mesh) return
 
     ccdPositions.forEach((_, i) => {
-      const mesh = groupRef.current?.children[i] as THREE.Mesh | undefined
-      if (!mesh) return
       const isOn = i < s * ccdPositions.length ? 1 : 0
       if (prev[i] !== isOn) {
         prev[i] = isOn
-        mesh.material = isOn ? ON_MAT : OFF_MAT
-      }
-
-      if (isOn) {
-        const phase = Math.sin(state.clock.elapsedTime * 2 + i * 1.2) * 0.5 + 0.5
-        mesh.position.y = 0.03 + phase * 0.015
-      } else {
-        mesh.position.y = 0.03
+        mesh.setColorAt(i, isOn ? ON_COLOR : OFF_COLOR)
       }
     })
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
 
     ifLines.forEach((line, i) => {
       const mat = line.material as THREE.LineBasicMaterial
@@ -80,7 +90,6 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* I/O Die center */}
       <mesh position={[0, 0.02, 0]}>
         <boxGeometry args={[1.2, 0.08, 0.6]} />
         <meshStandardMaterial color="#2a0808" metalness={0.5} roughness={0.4} />
@@ -91,18 +100,13 @@ export default function AMDChipletDie({ scrollRef, groupRef }: { scrollRef: Reac
         <meshStandardMaterial color="#FF6900" emissive="#FF6900" emissiveIntensity={0.8} metalness={0.5} roughness={0.3} />
       </mesh>
 
-      {/* CCD chiplets */}
-      {ccdPositions.map((pos, i) => (
-        <mesh key={i} position={pos} geometry={ccdGeo} material={OFF_MAT} />
-      ))}
+      <instancedMesh ref={meshRef} args={[ccdGeo, CCD_MAT, ccdPositions.length]} />
 
-      {/* IOD glow */}
       <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[2, 1.5]} />
         <meshBasicMaterial color="#ED1C24" transparent opacity={0.06} />
       </mesh>
 
-      {/* Infinity Fabric links */}
       {ifLines.map((line, i) => (
         <primitive key={i} object={line} />
       ))}
