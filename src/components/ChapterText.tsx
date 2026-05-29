@@ -19,10 +19,6 @@ export default function ChapterText({ label, title, children, align = 'center' }
         className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs"
         style={{ borderColor: `${color}33`, backgroundColor: `${color}0D`, color }}
       >
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: color }} />
-          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: color }} />
-        </span>
         {label}
       </span>
       <h2

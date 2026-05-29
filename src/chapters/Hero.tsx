@@ -15,10 +15,6 @@ function VendorHero() {
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs mb-6 ${vis ? 'animate-fade-up' : 'opacity-0'}`}
           style={{ borderColor: `${color}4D`, backgroundColor: `${color}1A`, color }}
         >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: color }} />
-            <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: color }} />
-          </span>
           A 3D Scrollytelling Experience
         </div>
 
