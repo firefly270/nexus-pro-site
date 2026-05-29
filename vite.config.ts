@@ -35,7 +35,6 @@ export default defineConfig({
           if (id.includes('node_modules/@react-three')) return 'vendor-r3f'
           if (id.includes('node_modules/gsap') || id.includes('node_modules/@gsap')) return 'vendor-gsap'
           if (id.includes('node_modules/lenis')) return 'vendor-lenis'
-          if (id.includes('node_modules/react-helmet-async')) return 'vendor-helmet'
           if (id.includes('node_modules')) return 'vendor'
         },
       },

@@ -1,14 +1,14 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { ReactLenis } from 'lenis/react';
-import { Helmet } from 'react-helmet-async';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState } from './store/useBoundStore';
 import { AudioEngine } from './utils/audioManager';
 import { usePerformanceOrchestrator } from './hooks/usePerformanceOrchestrator';
 import Navbar from './components/Navbar';
-import Scene from './3d/Scene';
 import Footer from './components/Footer';
 import Hero from './chapters/Hero';
+
+const Scene = lazy(() => import('./3d/Scene'));
 
 import OfflineIndicator from './components/OfflineIndicator';
 import AccessibleAnnouncer from './components/AccessibleAnnouncer';
@@ -142,11 +142,8 @@ function useMouseGradient() {
 }
 
 function AppContent() {
-  const { vendor, config, isSelected } = useVendor();
+  const { vendor, config } = useVendor();
   const title = config?.heroTitle ?? 'The Silicon Revolution';
-  const desc = isSelected
-    ? (config?.heroSubtitle ?? '')
-    : 'From pixels to paradigms — processor innovation across three titans of silicon.';
 
   usePerformanceOrchestrator();
   useMouseGradient();
@@ -159,6 +156,10 @@ function AppContent() {
       document.documentElement.style.setProperty('--vendor-accent', config.accent);
     }
   }, [config?.color, config?.accent]);
+
+  useEffect(() => {
+    document.title = title || 'The Silicon Revolution';
+  }, [title]);
 
   useEffect(() => {
     const onInteraction = () => {
@@ -193,34 +194,12 @@ function AppContent() {
             background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${config?.color ?? '#76B900'}08, transparent 60%)`,
           }}
         />
-        <Helmet>
-          <html lang="en" />
-          <title>{title}</title>
-          <meta name="description" content={desc} />
-          <meta name="keywords" content="GPU, CPU, NVIDIA, AMD, Intel, graphics, processor, scrollytelling" />
-          <meta name="author" content="The Silicon Revolution" />
-          <meta name="robots" content="index, follow" />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={desc} />
-          <meta property="og:type" content="website" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <script type="application/ld+json">{JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'TechArticle',
-            headline: title,
-            description: desc,
-            author: { '@type': 'Organization', name: 'The Silicon Revolution' },
-            about: {
-              '@type': 'Thing',
-              name: 'Graphics processing unit history',
-              description: 'The evolution of GPU and CPU architecture across NVIDIA, AMD, and Intel',
-            },
-          })}</script>
-        </Helmet>
         <a href="#main-content" className="skip-to-content">Skip to content</a>
         <div className="split-root">
           <div className="split-canvas">
-            <Scene key={vendor ?? 'picker'} />
+            <Suspense fallback={null}>
+              <Scene key={vendor ?? 'picker'} />
+            </Suspense>
           </div>
           <div className="split-content">
             <Navbar />

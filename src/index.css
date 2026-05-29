@@ -66,7 +66,13 @@
   --era-card-transform: none;
 }
 
-[data-era] * { transition: font-family 0.8s ease, border 0.8s ease, background 0.8s ease, border-radius 0.8s ease, gap 0.8s ease, box-shadow 0.8s ease; }
+/* Era transitions — targeted to specific elements only */
+[data-era] .chapter-fade,
+[data-era] .corner-notch,
+[data-era] .capsule-tag,
+[data-era] .segment-block {
+  transition: font-family 0.8s ease, border 0.8s ease, background 0.8s ease, border-radius 0.8s ease, gap 0.8s ease, box-shadow 0.8s ease;
+}
 
 [data-theme="light"] {
   color-scheme: light;
@@ -160,7 +166,7 @@
   }
 }
 
-html { scroll-behavior: smooth; overscroll-behavior: none; }
+html { overscroll-behavior: none; }
 
 /* Hide Lenis scroll progress indicator */
 html.lenis, html.lenis body { overscroll-behavior: none; scrollbar-width: none; }
@@ -203,7 +209,6 @@ body::after {
   white-space: nowrap;
   border: 0;
 }
-::-webkit-scrollbar { display: none; }
 
 /* Phase 21 — Bento Engine Additions */
 
