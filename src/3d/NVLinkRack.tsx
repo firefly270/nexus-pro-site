@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Group, CatmullRomCurve3, Vector3, BufferGeometry, Line, LineBasicMaterial } from 'three'
 
 function rng(seed: number) {
   let s = seed
@@ -14,7 +14,7 @@ const TRAY_WIDTH = 1.2
 const TRAY_DEPTH = 0.6
 
 export default function NVLinkRack({ scrollRef }: { scrollRef: React.RefObject<number> }) {
-  const groupRef = useRef<THREE.Group>(null)
+  const groupRef = useRef<Group>(null)
 
   const trayPositions = useMemo(() => {
     const pos: number[] = []
@@ -28,22 +28,22 @@ export default function NVLinkRack({ scrollRef }: { scrollRef: React.RefObject<n
 
   const linkCurves = useMemo(() => {
     const rand = rng(77)
-    const curves: THREE.CatmullRomCurve3[] = []
+    const curves: CatmullRomCurve3[] = []
 
     for (let i = 0; i < TRAYS; i++) {
       for (let j = i + 1; j < TRAYS; j++) {
         if (rand() > 0.45) {
-          curves.push(new THREE.CatmullRomCurve3([
-            new THREE.Vector3(0.65, trayPositions[i]!, 0),
-            new THREE.Vector3(0.80, (trayPositions[i]! + trayPositions[j]!) / 2, rand() * 0.2 - 0.1),
-            new THREE.Vector3(0.65, trayPositions[j]!, 0),
+          curves.push(new CatmullRomCurve3([
+            new Vector3(0.65, trayPositions[i]!, 0),
+            new Vector3(0.80, (trayPositions[i]! + trayPositions[j]!) / 2, rand() * 0.2 - 0.1),
+            new Vector3(0.65, trayPositions[j]!, 0),
           ]))
         }
         if (rand() > 0.45) {
-          curves.push(new THREE.CatmullRomCurve3([
-            new THREE.Vector3(-0.65, trayPositions[i]!, 0),
-            new THREE.Vector3(-0.80, (trayPositions[i]! + trayPositions[j]!) / 2, rand() * 0.2 - 0.1),
-            new THREE.Vector3(-0.65, trayPositions[j]!, 0),
+          curves.push(new CatmullRomCurve3([
+            new Vector3(-0.65, trayPositions[i]!, 0),
+            new Vector3(-0.80, (trayPositions[i]! + trayPositions[j]!) / 2, rand() * 0.2 - 0.1),
+            new Vector3(-0.65, trayPositions[j]!, 0),
           ]))
         }
       }
@@ -51,10 +51,10 @@ export default function NVLinkRack({ scrollRef }: { scrollRef: React.RefObject<n
 
     const switchY = trayPositions[trayPositions.length - 1]! + TRAY_HEIGHT / 2 + TRAY_GAP + 0.15
     for (let i = 0; i < TRAYS; i++) {
-      curves.push(new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, switchY + 0.1, 0),
-        new THREE.Vector3(0, (switchY + trayPositions[i]!) / 2, 0),
-        new THREE.Vector3(0, trayPositions[i]!, 0.35),
+      curves.push(new CatmullRomCurve3([
+        new Vector3(0, switchY + 0.1, 0),
+        new Vector3(0, (switchY + trayPositions[i]!) / 2, 0),
+        new Vector3(0, trayPositions[i]!, 0.35),
       ]))
     }
     return curves
@@ -62,8 +62,8 @@ export default function NVLinkRack({ scrollRef }: { scrollRef: React.RefObject<n
 
   const lineObjects = useMemo(() =>
     linkCurves.map((c, i) => {
-      const geo = new THREE.BufferGeometry().setFromPoints(c.getPoints(16))
-      return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: '#76B900', transparent: true, opacity: 0.2 + (i % 3) * 0.1 }))
+      const geo = new BufferGeometry().setFromPoints(c.getPoints(16))
+      return new Line(geo, new LineBasicMaterial({ color: '#76B900', transparent: true, opacity: 0.2 + (i % 3) * 0.1 }))
     }),
   [linkCurves])
 

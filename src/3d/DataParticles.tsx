@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Color, Points, BufferAttribute, AdditiveBlending } from 'three'
 import { getVelocityBufferRef } from './FluidSimulation'
 
 function rng(seed: number) {
@@ -26,8 +26,8 @@ function makeParticles(count: number) {
 function makeColors(count: number) {
   const rand = rng(456)
   const col = new Float32Array(count * 3)
-  const green = new THREE.Color('#76B900')
-  const cyan = new THREE.Color('#00D4AA')
+  const green = new Color('#76B900')
+  const cyan = new Color('#00D4AA')
   for (let i = 0; i < count; i++) {
     const t = rand()
     const c = green.clone().lerp(cyan, t)
@@ -37,7 +37,7 @@ function makeColors(count: number) {
 }
 
 export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: React.RefObject<number>; count?: number }) {
-  const ref = useRef<THREE.Points>(null)
+  const ref = useRef<Points>(null)
   const frameSkip = useRef(0)
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
   const skipEvery = isMobile ? 3 : 1
@@ -56,7 +56,7 @@ export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: 
     const s = scrollRef.current!
     const speed = 0.3 + s * 0.5
     const geo = el.geometry
-    const attr = geo.attributes.position as THREE.BufferAttribute
+    const attr = geo.attributes.position as BufferAttribute
     const arr = attr.array as Float32Array
     const phArr = phases as Float32Array
     const velBuf = getVelocityBufferRef()
@@ -88,7 +88,7 @@ export default function DataParticles({ scrollRef, count = 3000 }: { scrollRef: 
         <bufferAttribute attach="attributes-position" args={[positions, 3]} count={count} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-color" args={[colors, 3]} count={count} array={colors} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.04} vertexColors transparent opacity={0.7} sizeAttenuation blending={THREE.AdditiveBlending} depthWrite={false} />
+      <pointsMaterial size={0.04} vertexColors transparent opacity={0.7} sizeAttenuation blending={AdditiveBlending} depthWrite={false} />
     </points>
   )
 }

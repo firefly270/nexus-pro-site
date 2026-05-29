@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
-import * as THREE from 'three'
+import { Color, Group, InstancedMesh, Object3D, BoxGeometry } from 'three'
 import { useBoundStore } from '../store/useBoundStore'
 import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
@@ -13,20 +13,20 @@ function smoothstep(edge0: number, edge1: number, x: number) {
 const OFF_COLOR_STR = '#0d2d0d'
 const ON_COLOR_STR = '#76B900'
 const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
-const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
-const ON_COLOR = new THREE.Color(ON_COLOR_STR)
+const OFF_COLOR = new Color(OFF_COLOR_STR)
+const ON_COLOR = new Color(ON_COLOR_STR)
 
-export default function GPUDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null)
-  const dummy = useMemo(() => new THREE.Object3D(), [])
+export default function GPUDie({ groupRef }: { groupRef: React.RefObject<Group | null> }) {
+  const meshRef = useRef<InstancedMesh>(null)
+  const dummy = useMemo(() => new Object3D(), [])
   const prevLit = useRef(new Float32Array(24).fill(-1))
-  const tempColor = useMemo(() => new THREE.Color(), [])
+  const tempColor = useMemo(() => new Color(), [])
   const prevScroll = useRef(0)
   const heatVal = useRef(0)
   const { pointer } = useThree()
 
-  const smGeo = useMemo(() => new THREE.BoxGeometry(0.1, 0.04, 0.1), [])
-  const wireGeo = useMemo(() => new THREE.BoxGeometry(0.18, 0.01, 0.01), [])
+  const smGeo = useMemo(() => new BoxGeometry(0.1, 0.04, 0.1), [])
+  const wireGeo = useMemo(() => new BoxGeometry(0.18, 0.01, 0.01), [])
 
   const smPositions = useMemo(() => {
     const pos: [number, number, number][] = []

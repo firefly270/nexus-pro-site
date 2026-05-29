@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Color, Group, InstancedMesh, Object3D, BoxGeometry, Line, LineBasicMaterial, Vector3, CatmullRomCurve3, BufferGeometry } from 'three'
 import { useBoundStore } from '../store/useBoundStore'
 import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
@@ -12,19 +12,19 @@ function rng(seed: number) {
 const OFF_COLOR_STR = '#1a0505'
 const ON_COLOR_STR = '#ED1C24'
 const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
-const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
-const ON_COLOR = new THREE.Color(ON_COLOR_STR)
+const OFF_COLOR = new Color(OFF_COLOR_STR)
+const ON_COLOR = new Color(ON_COLOR_STR)
 
-export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null)
-  const dummy = useMemo(() => new THREE.Object3D(), [])
+export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<Group | null> }) {
+  const meshRef = useRef<InstancedMesh>(null)
+  const dummy = useMemo(() => new Object3D(), [])
   const rand = useMemo(() => rng(42), [])
   const prevLit = useRef(new Float32Array(6).fill(-1))
   const { pointer } = useThree()
   const prevScroll = useRef(0)
   const heatVal = useRef(0)
 
-  const ccdGeo = useMemo(() => new THREE.BoxGeometry(0.5, 0.06, 0.4), [])
+  const ccdGeo = useMemo(() => new BoxGeometry(0.5, 0.06, 0.4), [])
 
   const ccdPositions = useMemo(() => {
     const pos: [number, number, number][] = []
@@ -50,9 +50,9 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
   }, [ccdPositions, dummy])
 
   const ifLines = useMemo(() => {
-    const lines: THREE.Line[] = []
+    const lines: Line[] = []
     const iodCenters: [number, number][] = [[-0.5, 0.0], [0.5, 0.0]]
-    const mat = new THREE.LineBasicMaterial({ color: '#ED1C24', transparent: true, opacity: 0.3 })
+    const mat = new LineBasicMaterial({ color: '#ED1C24', transparent: true, opacity: 0.3 })
 
     ccdPositions.forEach((ccd, i) => {
       let bestDist = Infinity
@@ -61,13 +61,13 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
         const dist = Math.sqrt((ccd[0] - iod[0]) ** 2 + (ccd[2] - iod[1]) ** 2)
         if (dist < bestDist) { bestDist = dist; bestIod = iod }
       })
-      const a = new THREE.Vector3(ccd[0], 0.02, ccd[2])
-      const b = new THREE.Vector3(bestIod[0], 0.02, bestIod[1])
-      const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5)
+      const a = new Vector3(ccd[0], 0.02, ccd[2])
+      const b = new Vector3(bestIod[0], 0.02, bestIod[1])
+      const mid = new Vector3().addVectors(a, b).multiplyScalar(0.5)
       mid.y = 0.05 + Math.sin(i * 1.5 + rand() * 2) * 0.03
-      const curve = new THREE.CatmullRomCurve3([a, mid, b])
-      const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12))
-      lines.push(new THREE.Line(geo, mat))
+      const curve = new CatmullRomCurve3([a, mid, b])
+      const geo = new BufferGeometry().setFromPoints(curve.getPoints(12))
+      lines.push(new Line(geo, mat))
     })
     return lines
   }, [ccdPositions, rand])
@@ -100,7 +100,7 @@ export default function AMDChipletDie({ groupRef }: { groupRef: React.RefObject<
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
 
     ifLines.forEach((line, i) => {
-      const mat = line.material as THREE.LineBasicMaterial
+      const mat = line.material as LineBasicMaterial
       const phase = Math.sin(state.clock.elapsedTime * 1.5 + i * 0.8) * 0.3 + 0.3
       mat.opacity = phase * s
     })

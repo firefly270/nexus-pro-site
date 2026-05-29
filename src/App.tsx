@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { ReactLenis } from 'lenis/react';
+import { ReactLenis, useLenis } from 'lenis/react';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState } from './store/useBoundStore';
 import { AudioEngine } from './utils/audioManager';
@@ -147,6 +147,9 @@ function AppContent() {
 
   usePerformanceOrchestrator();
   useMouseGradient();
+  useLenis(({ progress }) => {
+    mutateTransientState({ scrollProgress: progress });
+  });
 
   useEffect(() => {
     if (config?.color) {

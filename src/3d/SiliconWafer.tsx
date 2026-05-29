@@ -1,10 +1,10 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Group, LineSegments, LineBasicMaterial, BufferGeometry, Float32BufferAttribute, DoubleSide } from 'three'
 
 export default function SiliconWafer({ scrollRef }: { scrollRef: React.RefObject<number> }) {
-  const groupRef = useRef<THREE.Group>(null)
-  const lineRef = useRef<THREE.LineSegments>(null)
+  const groupRef = useRef<Group>(null)
+  const lineRef = useRef<LineSegments>(null)
 
   useFrame(() => {
     if (!groupRef.current) return
@@ -16,13 +16,13 @@ export default function SiliconWafer({ scrollRef }: { scrollRef: React.RefObject
     groupRef.current.rotation.x = Math.sin(s * Math.PI) * 0.15
     groupRef.current.rotation.z = s * 0.3
     if (lineRef.current) {
-      const mat = lineRef.current.material as THREE.LineBasicMaterial
+      const mat = lineRef.current.material as LineBasicMaterial
       mat.opacity = opacity * 0.3
     }
   })
 
   const gridLines = useMemo(() => {
-    const geometry = new THREE.BufferGeometry()
+    const geometry = new BufferGeometry()
     const positions: number[] = []
     const segments = 30
     const gap = 0.15
@@ -37,7 +37,7 @@ export default function SiliconWafer({ scrollRef }: { scrollRef: React.RefObject
         positions.push(x, 0, z + dieSize, x, 0, z)
       }
     }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
     return geometry
   }, [])
 
@@ -45,14 +45,14 @@ export default function SiliconWafer({ scrollRef }: { scrollRef: React.RefObject
     <group ref={groupRef} position={[0, 0, -3]} scale={0}>
       <mesh>
         <circleGeometry args={[3.5, 64]} />
-        <meshBasicMaterial color="#0a2a0a" transparent opacity={0.2} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#0a2a0a" transparent opacity={0.2} side={DoubleSide} />
       </mesh>
       <lineSegments ref={lineRef} geometry={gridLines}>
         <lineBasicMaterial color="#1a4a1a" transparent opacity={0} />
       </lineSegments>
       <mesh position={[0, 0, 0.01]}>
         <ringGeometry args={[0.5, 3.5, 64]} />
-        <meshBasicMaterial color="#0d2d0d" transparent opacity={0.1} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#0d2d0d" transparent opacity={0.1} side={DoubleSide} />
       </mesh>
     </group>
   )

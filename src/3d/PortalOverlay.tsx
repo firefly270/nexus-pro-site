@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Scene, OrthographicCamera, Mesh, PlaneGeometry, ShaderMaterial, Color } from 'three'
 import { useBoundStore } from '../store/useBoundStore'
 import fullVert from './shaders/portal/fullscreen.vert?raw'
 import warpFrag from './shaders/portal/warp.frag?raw'
@@ -8,16 +8,16 @@ import { vendorConfigs } from '../constants/vendors'
 
 export default function PortalOverlay() {
   const gl = useThree((s) => s.gl)
-  const scene = useMemo(() => new THREE.Scene(), [])
-  const camera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), [])
-  const quad = useMemo(() => new THREE.Mesh(new THREE.PlaneGeometry(2, 2)), [])
+  const scene = useMemo(() => new Scene(), [])
+  const camera = useMemo(() => new OrthographicCamera(-1, 1, 1, -1, 0, 1), [])
+  const quad = useMemo(() => new Mesh(new PlaneGeometry(2, 2)), [])
   scene.add(quad)
 
-  const mat = useMemo(() => new THREE.ShaderMaterial({
+  const mat = useMemo(() => new ShaderMaterial({
     uniforms: {
       uProgress: { value: 0 },
-      uColor1: { value: new THREE.Color('#76B900') },
-      uColor2: { value: new THREE.Color('#00D4AA') },
+      uColor1: { value: new Color('#76B900') },
+      uColor2: { value: new Color('#00D4AA') },
       uScene: { value: null },
     },
     vertexShader: fullVert,

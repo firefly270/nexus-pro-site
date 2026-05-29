@@ -1,23 +1,23 @@
 import { useMemo, useRef, useEffect, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Vector2, WebGLRenderTarget, LinearFilter, HalfFloatType, Scene, OrthographicCamera, Mesh, PlaneGeometry, ShaderMaterial } from 'three'
 import fullVert from './shaders/fluid/fullscreen.vert?raw'
 import computeFrag from './shaders/fluid/compute.frag?raw'
 import { useBoundStore } from '../store/useBoundStore'
 import { WebGPUComputeFluid, type FluidParams } from './webgpu/WebGPUCompute'
 
 const RES = 128
-const TEXEL = new THREE.Vector2(1 / RES, 1 / RES)
+const TEXEL = new Vector2(1 / RES, 1 / RES)
 
 let velocityBuf: Float32Array | null = null
 
 export function getVelocityBufferRef() { return velocityBuf }
 
-function makeRT(): THREE.WebGLRenderTarget {
-  return new THREE.WebGLRenderTarget(RES, RES, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    type: THREE.HalfFloatType,
+function makeRT(): WebGLRenderTarget {
+  return new WebGLRenderTarget(RES, RES, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    type: HalfFloatType,
     depthBuffer: false,
   })
 }
@@ -29,20 +29,20 @@ export default function FluidSimulation() {
   const readIdx = useRef(0)
 
   const targets = useMemo(() => [makeRT(), makeRT()], [])
-  const scene = useMemo(() => new THREE.Scene(), [])
-  const camera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), [])
-  const quad = useMemo(() => new THREE.Mesh(new THREE.PlaneGeometry(2, 2)), [])
+  const scene = useMemo(() => new Scene(), [])
+  const camera = useMemo(() => new OrthographicCamera(-1, 1, 1, -1, 0, 1), [])
+  const quad = useMemo(() => new Mesh(new PlaneGeometry(2, 2)), [])
   scene.add(quad)
 
-  const computeMat = useMemo(() => new THREE.ShaderMaterial({
+  const computeMat = useMemo(() => new ShaderMaterial({
     uniforms: {
       uVelocity: { value: null },
       uPressure: { value: null },
       uTexelSize: { value: TEXEL },
       uDt: { value: 0.016 },
       uDissipation: { value: 0.99 },
-      uForcePos: { value: new THREE.Vector2(0.5, 0.5) },
-      uForceVec: { value: new THREE.Vector2(0, 0) },
+      uForcePos: { value: new Vector2(0.5, 0.5) },
+      uForceVec: { value: new Vector2(0, 0) },
       uForceStrength: { value: 0 },
     },
     vertexShader: fullVert,

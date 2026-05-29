@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Vector3, CatmullRomCurve3, MathUtils } from 'three'
 import { useVendor } from '../context/VendorContext'
 import { useBoundStore } from '../store/useBoundStore'
 import { tickTransition, shouldSwapVendor } from './SceneTransition'
@@ -51,19 +51,19 @@ const KF_MAP: Record<string, KfPt[]> = {
 export default function CameraSpline() {
   const { camera } = useThree()
   const { vendor } = useVendor()
-  const currentPos = useRef(new THREE.Vector3())
-  const currentTarget = useRef(new THREE.Vector3())
-  const tempPos = useRef(new THREE.Vector3())
-  const tempTarget = useRef(new THREE.Vector3())
+  const currentPos = useRef(new Vector3())
+  const currentTarget = useRef(new Vector3())
+  const tempPos = useRef(new Vector3())
+  const tempTarget = useRef(new Vector3())
   const swapped = useRef(false)
 
   const splines = useMemo(() => {
     const pts = KF_MAP[vendor ?? 'nvidia'] ?? NVIDIA_KF
-    const pos = pts.map(p => new THREE.Vector3(p.x, p.y, p.z))
-    const tgt = pts.map(p => new THREE.Vector3(p.tx, p.ty, p.tz))
+    const pos = pts.map(p => new Vector3(p.x, p.y, p.z))
+    const tgt = pts.map(p => new Vector3(p.tx, p.ty, p.tz))
     return {
-      posSpline: new THREE.CatmullRomCurve3(pos, false, 'centripetal'),
-      tgtSpline: new THREE.CatmullRomCurve3(tgt, false, 'centripetal'),
+      posSpline: new CatmullRomCurve3(pos, false, 'centripetal'),
+      tgtSpline: new CatmullRomCurve3(tgt, false, 'centripetal'),
     }
   }, [vendor])
 
@@ -92,7 +92,7 @@ export default function CameraSpline() {
       }
     }
 
-    const clamped = THREE.MathUtils.clamp(t, 0, 1)
+    const clamped = MathUtils.clamp(t, 0, 1)
     splines.posSpline.getPointAt(clamped, tempPos.current)
     splines.tgtSpline.getPointAt(clamped, tempTarget.current)
 

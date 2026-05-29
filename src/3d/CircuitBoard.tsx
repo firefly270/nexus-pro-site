@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Vector3, CatmullRomCurve3, BufferGeometry, BufferAttribute, Line, LineBasicMaterial } from 'three'
 
 function rng(seed: number) {
   let s = seed
@@ -9,17 +9,17 @@ function rng(seed: number) {
 
 function generateTraces(count: number) {
   const rand = rng(42)
-  const traces: THREE.Vector3[][] = []
+  const traces: Vector3[][] = []
   for (let i = 0; i < count; i++) {
-    const points: THREE.Vector3[] = []
+    const points: Vector3[] = []
     const x = -1.5 + rand() * 3
     const z = -1.5 + rand() * 3
-    points.push(new THREE.Vector3(x, 0, z))
+    points.push(new Vector3(x, 0, z))
     const segments = 3 + Math.floor(rand() * 4)
     for (let j = 1; j <= segments; j++) {
       const a = -1.5 + rand() * 3
       const b = -1.5 + rand() * 3
-      points.push(new THREE.Vector3(a, 0.01, b))
+      points.push(new Vector3(a, 0.01, b))
     }
     traces.push(points)
   }
@@ -27,7 +27,7 @@ function generateTraces(count: number) {
 }
 
 export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject<number> }) {
-  const geoRefs = useRef<THREE.BufferGeometry[]>([])
+  const geoRefs = useRef<BufferGeometry[]>([])
 
   const traces = useMemo(() => generateTraces(30), [])
 
@@ -39,7 +39,7 @@ export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject
     }
     return Array.from(indicesSet).map(idx => ({
       idx,
-      curvePts: new THREE.CatmullRomCurve3(traces[idx]!).getPoints(20),
+      curvePts: new CatmullRomCurve3(traces[idx]!).getPoints(20),
     }))
   }, [traces])
 
@@ -50,7 +50,7 @@ export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject
       if (!geo) return
       const totalPts = t.curvePts.length
       const activePts = Math.max(2, Math.floor(totalPts * Math.min(s * 2, 1)))
-      const posAttr = geo.attributes.position as THREE.BufferAttribute
+      const posAttr = geo.attributes.position as BufferAttribute
       const positions = posAttr.array as Float32Array
       for (let j = 0; j < totalPts; j++) {
         const p = t.curvePts[Math.min(j, activePts - 1)]
@@ -65,16 +65,16 @@ export default function CircuitBoard({ scrollRef }: { scrollRef: React.RefObject
   })
 
   const inactiveLines = useMemo(() => traces.map(t =>
-    new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(new THREE.CatmullRomCurve3(t).getPoints(20)),
-      new THREE.LineBasicMaterial({ color: '#1a3a1a', transparent: true, opacity: 0.3 })
+    new Line(
+      new BufferGeometry().setFromPoints(new CatmullRomCurve3(t).getPoints(20)),
+      new LineBasicMaterial({ color: '#1a3a1a', transparent: true, opacity: 0.3 })
     )
   ), [traces])
 
   const activeLines = useMemo(() => activeTraces.map((t) =>
-    new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(t.curvePts),
-      new THREE.LineBasicMaterial({ color: '#76B900' }),
+    new Line(
+      new BufferGeometry().setFromPoints(t.curvePts),
+      new LineBasicMaterial({ color: '#76B900' }),
     )
   ), [activeTraces])
 

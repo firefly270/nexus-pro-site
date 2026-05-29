@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Color, ShaderMaterial, Vector2 } from 'three'
 
 const vertexShader = `
 varying vec2 vUv;
@@ -54,26 +54,26 @@ void main() {
 `
 
 const colorPalettes = [
-  [new THREE.Color('#030712'), new THREE.Color('#0a1a0a')],
-  [new THREE.Color('#0a0f0a'), new THREE.Color('#0d2d0d')],
-  [new THREE.Color('#060d06'), new THREE.Color('#0a1a0a')],
-  [new THREE.Color('#040904'), new THREE.Color('#0f2a0f')],
-  [new THREE.Color('#020602'), new THREE.Color('#0d2d0d')],
-  [new THREE.Color('#030a03'), new THREE.Color('#0a1a0a')],
+  [new Color('#030712'), new Color('#0a1a0a')],
+  [new Color('#0a0f0a'), new Color('#0d2d0d')],
+  [new Color('#060d06'), new Color('#0a1a0a')],
+  [new Color('#040904'), new Color('#0f2a0f')],
+  [new Color('#020602'), new Color('#0d2d0d')],
+  [new Color('#030a03'), new Color('#0a1a0a')],
 ]
 
 export default function TechBackground({ scrollRef }: { scrollRef: React.RefObject<number> }) {
-  const ref = useRef<THREE.ShaderMaterial>(null)
+  const ref = useRef<ShaderMaterial>(null)
   const { pointer } = useThree()
 
   const uniforms = useMemo(() => {
-    const pal = colorPalettes[0] as [THREE.Color, THREE.Color]
+    const pal = colorPalettes[0] as [Color, Color]
     return {
       uColor1: { value: pal[0].clone() },
       uColor2: { value: pal[1].clone() },
       uTime: { value: 0 },
       uProgress: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uMouse: { value: new Vector2(0.5, 0.5) },
     }
   }, [])
 

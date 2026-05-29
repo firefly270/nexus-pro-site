@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import * as THREE from 'three'
+import { Group, Vector2 } from 'three'
 import { useVendor } from '../context/VendorContext'
 import { usePageVisible } from '../hooks/usePageVisible'
-import { mutateTransientState, useBoundStore } from '../store/useBoundStore'
+import { useBoundStore } from '../store/useBoundStore'
 import GPUDie from './GPUDie'
 import CircuitBoard from './CircuitBoard'
 import DataParticles from './DataParticles'
@@ -19,9 +17,6 @@ import CameraSpline from './CameraSpline'
 import FluidSimulation from './FluidSimulation'
 import PortalOverlay from './PortalOverlay'
 
-gsap.registerPlugin(ScrollTrigger)
-gsap.ticker.lagSmoothing(0)
-
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
   return t * t * (3 - 2 * t)
@@ -30,35 +25,17 @@ function smoothstep(edge0: number, edge1: number, x: number) {
 function SceneContent() {
   const { vendor, config } = useVendor()
   const settings = useBoundStore((s) => s.settings)
-  const progress = useMemo(() => ({ value: 0 }), [])
   const scrollRef = useRef(0)
   const pageVisible = usePageVisible()
 
-  const dieRef = useRef<THREE.Group>(null)
-  const amdRef = useRef<THREE.Group>(null)
-  const intelRef = useRef<THREE.Group>(null)
-
-  useEffect(() => {
-    gsap.to(progress, {
-      value: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#scroll-container',
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 2,
-      },
-    })
-    return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill())
-    }
-  }, [progress])
+  const dieRef = useRef<Group>(null)
+  const amdRef = useRef<Group>(null)
+  const intelRef = useRef<Group>(null)
 
   useFrame(() => {
     if (!pageVisible.current) return
-    const s = progress.value
+    const s = useBoundStore.getState().transient.scrollProgress
     scrollRef.current = s
-    mutateTransientState({ scrollProgress: s })
 
     if (dieRef.current) {
       dieRef.current.rotation.y = s * Math.PI * 0.5 + Math.sin(s * Math.PI * 3) * 0.15
@@ -106,7 +83,7 @@ function SceneContent() {
       <SiliconWafer scrollRef={scrollRef} />
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={bloomIntensity} luminanceThreshold={0.15} luminanceSmoothing={0.85} mipmapBlur />
-        <ChromaticAberration offset={new THREE.Vector2(settings.caEnabled ? 0.0015 : 0, settings.caEnabled ? 0.0015 : 0)} radialModulation />
+        <ChromaticAberration offset={new Vector2(settings.caEnabled ? 0.0015 : 0, settings.caEnabled ? 0.0015 : 0)} radialModulation />
         <Vignette eskil={false} offset={0.3} darkness={0.6} />
       </EffectComposer>
     </>

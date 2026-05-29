@@ -1,28 +1,28 @@
 import { useMemo, useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Color, Group, InstancedMesh, LineSegments, Object3D, BoxGeometry, Vector3, BufferGeometry, LineBasicMaterial, DoubleSide } from 'three'
 import { useBoundStore } from '../store/useBoundStore'
 import { createIridescentMaterial } from './shaders/IridescentMaterial'
 
 const OFF_COLOR_STR = '#0a0a1a'
 const ON_COLOR_STR = '#0071C5'
 const IRIDESCENT_MAT = createIridescentMaterial(OFF_COLOR_STR, ON_COLOR_STR)
-const OFF_COLOR = new THREE.Color(OFF_COLOR_STR)
-const ON_COLOR = new THREE.Color(ON_COLOR_STR)
+const OFF_COLOR = new Color(OFF_COLOR_STR)
+const ON_COLOR = new Color(ON_COLOR_STR)
 
-export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null)
-  const lineRefs = useRef<(THREE.LineSegments | null)[]>([])
-  const dummy = useMemo(() => new THREE.Object3D(), [])
+export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.RefObject<Group | null> }) {
+  const meshRef = useRef<InstancedMesh>(null)
+  const lineRefs = useRef<(LineSegments | null)[]>([])
+  const dummy = useMemo(() => new Object3D(), [])
   const prevActive = useRef(new Float32Array(25).fill(-1))
-  const tempColor = useMemo(() => new THREE.Color(), [])
+  const tempColor = useMemo(() => new Color(), [])
   const { pointer } = useThree()
   const prevScroll = useRef(0)
   const heatVal = useRef(0)
 
   const gridSize = 5
   const spacing = 0.35
-  const tileGeo = useMemo(() => new THREE.BoxGeometry(0.15, 0.04, 0.15), [])
+  const tileGeo = useMemo(() => new BoxGeometry(0.15, 0.04, 0.15), [])
 
   const { tilePositions, meshLines } = useMemo(() => {
     const tiles: [number, number][] = []
@@ -79,7 +79,7 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
       if (prev[i] !== isOn) {
         prev[i] = isOn
         if (isOn) {
-          tempColor.copy(ON_COLOR).lerp(new THREE.Color('#ffffff'), wave * 0.2)
+          tempColor.copy(ON_COLOR).lerp(new Color('#ffffff'), wave * 0.2)
           mesh.setColorAt(i, tempColor)
         } else {
           mesh.setColorAt(i, OFF_COLOR)
@@ -104,7 +104,7 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
 
     lineRefs.current.forEach((line, i) => {
       if (!line) return
-      const mat = line.material as THREE.LineBasicMaterial
+      const mat = line.material as LineBasicMaterial
       const idxProgress = s * meshLines.length
       const baseOpacity = i < idxProgress ? 0.4 : 0.04
       const dataPulse = Math.sin(state.clock.elapsedTime * 4 + i * 0.3) * 0.5 + 0.5
@@ -116,17 +116,17 @@ export default function IntelMeshInterconnect({ groupRef }: { groupRef: React.Re
     <group ref={groupRef} position={[0, 0, 0]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <ringGeometry args={[spacing * 2.5, spacing * 2.7, 64]} />
-        <meshBasicMaterial color="#0071C5" transparent opacity={0.08} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#0071C5" transparent opacity={0.08} side={DoubleSide} />
       </mesh>
 
       <instancedMesh ref={meshRef} args={[tileGeo, IRIDESCENT_MAT, tilePositions.length]} />
 
       {meshLines.map((line, i) => {
         const pts = [
-          new THREE.Vector3(line.start[0], 0.02, line.start[1]),
-          new THREE.Vector3(line.end[0], 0.02, line.end[1]),
+          new Vector3(line.start[0], 0.02, line.start[1]),
+          new Vector3(line.end[0], 0.02, line.end[1]),
         ]
-        const geo = new THREE.BufferGeometry().setFromPoints(pts)
+        const geo = new BufferGeometry().setFromPoints(pts)
         return (
           <lineSegments
             key={i}
