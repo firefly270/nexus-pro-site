@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -21,24 +21,25 @@ export default function SiliconWafer({ scrollRef }: { scrollRef: React.RefObject
     }
   })
 
-  const gridLines = new THREE.BufferGeometry()
-  const gridPositions: number[] = []
-  const segments = 30
-  const gap = 0.15
-  const dieSize = 0.08
-
-  for (let r = 0; r < segments; r++) {
-    for (let c = 0; c < segments; c++) {
-      const x = -segments * gap / 2 + c * gap
-      const z = -segments * gap / 2 + r * gap
-      gridPositions.push(x, 0, z, x + dieSize, 0, z)
-      gridPositions.push(x + dieSize, 0, z, x + dieSize, 0, z + dieSize)
-      gridPositions.push(x + dieSize, 0, z + dieSize, x, 0, z + dieSize)
-      gridPositions.push(x, 0, z + dieSize, x, 0, z)
+  const gridLines = useMemo(() => {
+    const geometry = new THREE.BufferGeometry()
+    const positions: number[] = []
+    const segments = 30
+    const gap = 0.15
+    const dieSize = 0.08
+    for (let r = 0; r < segments; r++) {
+      for (let c = 0; c < segments; c++) {
+        const x = -segments * gap / 2 + c * gap
+        const z = -segments * gap / 2 + r * gap
+        positions.push(x, 0, z, x + dieSize, 0, z)
+        positions.push(x + dieSize, 0, z, x + dieSize, 0, z + dieSize)
+        positions.push(x + dieSize, 0, z + dieSize, x, 0, z + dieSize)
+        positions.push(x, 0, z + dieSize, x, 0, z)
+      }
     }
-  }
-
-  gridLines.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3))
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    return geometry
+  }, [])
 
   return (
     <group ref={groupRef} position={[0, 0, -3]} scale={0}>

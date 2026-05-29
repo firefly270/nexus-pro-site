@@ -91,7 +91,7 @@ const RES = 128
 const CELLS = RES * RES
 const BUF_SIZE = CELLS * 4 * 4 // vec4<f32> per cell
 
-export function isWebGPUSupported(): boolean {
+function isWebGPUSupported(): boolean {
   return typeof navigator !== 'undefined' && 'gpu' in navigator && navigator.gpu != null
 }
 

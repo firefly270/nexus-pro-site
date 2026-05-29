@@ -63,5 +63,5 @@ export const useBoundStore = create<StoreState>()(
 
 export function mutateTransientState(updates: Partial<TransientState>) {
   const state = useBoundStore.getState();
-  Object.assign(state.transient, updates);
+  useBoundStore.setState({ transient: { ...state.transient, ...updates } });
 }

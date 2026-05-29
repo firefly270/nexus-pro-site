@@ -4,12 +4,10 @@ export default function ShareButton() {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
+    const title = document.title || 'The GPU Revolution';
+    const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'A 3D scrollytelling experience';
     if (navigator.share) {
-      await navigator.share({
-        title: 'The Silicon Valley Story',
-        text: 'A visual chronicle of Silicon Valley — from orchards to AI.',
-        url: window.location.href,
-      });
+      await navigator.share({ title, text: description, url: window.location.href });
     } else {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);

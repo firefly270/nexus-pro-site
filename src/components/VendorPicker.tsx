@@ -5,7 +5,7 @@ import { useVendor } from '../context/VendorContext';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
 
-function VendorCard({ v: _v, vc, onSelect }: { v: Vendor; vc: VendorConfig; onSelect: () => void }) {
+function VendorCard({ vc, onSelect }: { v: Vendor; vc: VendorConfig; onSelect: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {

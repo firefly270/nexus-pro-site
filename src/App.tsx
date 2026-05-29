@@ -158,7 +158,7 @@ function AppContent() {
     if (config?.accent) {
       document.documentElement.style.setProperty('--vendor-accent', config.accent);
     }
-  }, [config?.color]);
+  }, [config?.color, config?.accent]);
 
   useEffect(() => {
     const onInteraction = () => {

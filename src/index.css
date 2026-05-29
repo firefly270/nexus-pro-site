@@ -66,7 +66,7 @@
   --era-card-transform: none;
 }
 
-* { transition: font-family 0.8s ease, border 0.8s ease, background 0.8s ease, border-radius 0.8s ease, gap 0.8s ease, box-shadow 0.8s ease; }
+[data-era] * { transition: font-family 0.8s ease, border 0.8s ease, background 0.8s ease, border-radius 0.8s ease, gap 0.8s ease, box-shadow 0.8s ease; }
 
 [data-theme="light"] {
   color-scheme: light;
