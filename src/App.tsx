@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { ReactLenis, useLenis } from 'lenis/react';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState } from './store/useBoundStore';
@@ -134,9 +134,11 @@ function AppContent() {
   const title = config?.heroTitle ?? 'The Silicon Revolution';
 
   useMouseGradient();
-  useLenis(({ progress }) => {
+
+  const onLenisScroll = useCallback(({ progress }: { progress: number }) => {
     mutateTransientState({ scrollProgress: progress });
-  });
+  }, []);
+  useLenis(onLenisScroll);
 
   useEffect(() => {
     if (config?.color) {

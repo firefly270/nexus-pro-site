@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing'
 import { Group, Vector2 } from 'three'
@@ -85,7 +85,8 @@ function SceneContent() {
 
 export default function Scene() {
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
-  const dpr: [number, number] = useBoundStore((s) => isMobile ? [1, 1] : [1, s.settings.dpr])
+  const dprMax = useBoundStore((s) => isMobile ? 1 : s.settings.dpr)
+  const dpr: [number, number] = useMemo(() => [1, dprMax], [dprMax])
 
   return (
     <Canvas
