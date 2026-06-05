@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import sitemap from 'vite-plugin-sitemap'
-import { VitePWA } from 'vite-plugin-pwa'
 import viteCompression from 'vite-plugin-compression'
 const isAnalyze = process.argv.some(a => a === 'analyze' || a === '--mode analyze')
 
@@ -13,30 +12,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
     sitemap({ hostname: 'https://gpurevolution.space/' }),
-    VitePWA({
-      registerType: 'autoUpdate',
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,woff2,svg}'],
-        runtimeCaching: [
-          {
-            urlPattern: /\.(woff2|svg)$/,
-            handler: 'CacheFirst',
-            options: { cacheName: 'asset-cache', expiration: { maxEntries: 20, maxAgeSeconds: 86400 * 30 } },
-          },
-        ],
-      },
-      manifest: {
-        name: 'The GPU Revolution',
-        short_name: 'GPU Story',
-        description: 'A 3D scrollytelling journey through GPU history',
-        theme_color: '#030303',
-        background_color: '#030303',
-        display: 'standalone',
-        icons: [
-          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
-        ],
-      },
-    }),
     viteCompression({ algorithm: 'brotliCompress', threshold: 1024 }),
     isAnalyze && visualizer({ filename: 'dist/stats.html', open: true }),
   ].filter(Boolean),
