@@ -2,8 +2,6 @@ import { lazy, Suspense, useEffect } from 'react';
 import { ReactLenis, useLenis } from 'lenis/react';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState } from './store/useBoundStore';
-import { AudioEngine } from './utils/audioManager';
-import { usePerformanceOrchestrator } from './hooks/usePerformanceOrchestrator';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './chapters/Hero';
@@ -110,7 +108,6 @@ function VendorChapters() {
 function useMouseGradient() {
   useEffect(() => {
     let frame: number;
-    let lastScrollY = 0;
     const root = document.documentElement;
     const onMove = (e: MouseEvent) => {
       cancelAnimationFrame(frame);
@@ -122,20 +119,11 @@ function useMouseGradient() {
 
         const nx = (e.clientX / window.innerWidth) * 2 - 1;
         mutateTransientState({ mousePosition: [nx, -(y / 50 - 1)] });
-        if (AudioEngine) AudioEngine.updatePan(nx);
       });
     };
-    const onScroll = () => {
-      const delta = Math.abs(window.scrollY - lastScrollY);
-      lastScrollY = window.scrollY;
-      const velocity = Math.min(delta / 16, 8);
-      AudioEngine.updateFilterVelocity(velocity);
-    };
     window.addEventListener('mousemove', onMove, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
     };
   }, []);
@@ -145,7 +133,6 @@ function AppContent() {
   const { vendor, config } = useVendor();
   const title = config?.heroTitle ?? 'The Silicon Revolution';
 
-  usePerformanceOrchestrator();
   useMouseGradient();
   useLenis(({ progress }) => {
     mutateTransientState({ scrollProgress: progress });
@@ -163,20 +150,6 @@ function AppContent() {
   useEffect(() => {
     document.title = title || 'The Silicon Revolution';
   }, [title]);
-
-  useEffect(() => {
-    const onInteraction = () => {
-      AudioEngine.init();
-      window.removeEventListener('pointerdown', onInteraction);
-      window.removeEventListener('keydown', onInteraction);
-    };
-    window.addEventListener('pointerdown', onInteraction, { once: true });
-    window.addEventListener('keydown', onInteraction, { once: true });
-    return () => {
-      window.removeEventListener('pointerdown', onInteraction);
-      window.removeEventListener('keydown', onInteraction);
-    };
-  }, []);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

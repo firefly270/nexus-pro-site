@@ -5,17 +5,13 @@ import { Group, Vector2 } from 'three'
 import { useVendor } from '../context/VendorContext'
 import { usePageVisible } from '../hooks/usePageVisible'
 import { useBoundStore } from '../store/useBoundStore'
-import GPUDie from './GPUDie'
-import CircuitBoard from './CircuitBoard'
 import DataParticles from './DataParticles'
 import TechBackground from './TechBackground'
 import SiliconWafer from './SiliconWafer'
-import NVLinkRack from './NVLinkRack'
-import AMDChipletDie from './AMD_ChipletDie'
-import IntelMeshInterconnect from './Intel_MeshInterconnect'
 import CameraSpline from './CameraSpline'
 import FluidSimulation from './FluidSimulation'
 import PortalOverlay from './PortalOverlay'
+import { VendorScene } from './VendorScene'
 
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
@@ -68,15 +64,12 @@ function SceneContent() {
       <ambientLight intensity={0.3} />
       <pointLight position={[5, 5, 5]} intensity={0.6} color={color} />
       <pointLight position={[-5, -3, 2]} intensity={0.3} color={accent} />
-      {vendor === 'nvidia' && (
-        <>
-          <GPUDie groupRef={dieRef} />
-          <CircuitBoard scrollRef={scrollRef} />
-          <NVLinkRack scrollRef={scrollRef} />
-        </>
-      )}
-      {vendor === 'amd' && <AMDChipletDie groupRef={amdRef} />}
-      {vendor === 'intel' && <IntelMeshInterconnect groupRef={intelRef} />}
+      <VendorScene
+        dieRef={dieRef}
+        amdRef={amdRef}
+        intelRef={intelRef}
+        scrollRef={scrollRef}
+      />
       <FluidSimulation />
       <PortalOverlay />
       <DataParticles scrollRef={scrollRef} count={isMobile ? 500 : Math.round(3000 * settings.particleMultiplier)} />

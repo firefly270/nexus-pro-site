@@ -4,9 +4,7 @@ import { vendorConfigs } from '../constants/vendors';
 import type { Vendor } from '../types';
 import ShareButton from './ShareButton';
 import ThemeToggle from './ThemeToggle';
-import AudioToggle from './AudioToggle';
 import { announce } from './AccessibleAnnouncer';
-import { AudioEngine } from '../utils/audioManager';
 import { useBoundStore } from '../store/useBoundStore';
 
 const allVendors: Vendor[] = ['nvidia', 'amd', 'intel'];
@@ -82,7 +80,6 @@ export default function Navbar() {
 
   const switchVendor = (v: Vendor) => {
     const vc = vendorConfigs[v];
-    AudioEngine.playSwoosh(vendor ? 'down' : 'up');
     announce(`Switched to ${vc?.label ?? v}`);
     const trans = useBoundStore.getState().transition;
     if (trans.phase !== 'idle') return;
@@ -91,7 +88,6 @@ export default function Navbar() {
   };
 
   const handleClearVendor = () => {
-    AudioEngine.playSwoosh('down');
     announce('Showing all vendors');
     clearVendor();
     setMenuOpen(false);
@@ -137,7 +133,6 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <AudioToggle />
             <ShareButton />
             <ThemeToggle />
           </div>
