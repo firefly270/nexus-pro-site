@@ -3,16 +3,11 @@ import { ReactLenis, useLenis } from 'lenis/react';
 import { VendorProvider, useVendor } from './context/VendorContext';
 import { mutateTransientState, useBoundStore } from './store/useBoundStore';
 import { useScrollHash } from './hooks/useScrollHash';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import { Navbar, Footer, ErrorBoundary, OfflineIndicator, AccessibleAnnouncer } from './components';
 import Hero from './chapters/Hero';
 
 const Scene = lazy(() => import('./3d/Scene'));
 const GraphifyView = lazy(() => import('./components/GraphifyView'));
-
-import OfflineIndicator from './components/OfflineIndicator';
-import AccessibleAnnouncer from './components/AccessibleAnnouncer';
-import ErrorBoundary from './components/ErrorBoundary';
 
 const ChapterBeginning = lazy(() => import('./chapters/01-beginning'));
 const ChapterShaders = lazy(() => import('./chapters/02-shaders'));
