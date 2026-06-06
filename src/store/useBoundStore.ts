@@ -16,6 +16,7 @@ interface StoreState {
   config: VendorConfig | null;
   chapters: Chapter[];
   isAudioMuted: boolean;
+  isGraphViewEnabled: boolean;
   quality: QualityLevel;
   settings: PerformanceSettings;
   transition: TransitionState;
@@ -23,6 +24,7 @@ interface StoreState {
   setVendor: (v: Vendor | null) => void;
   clearVendor: () => void;
   toggleAudio: () => void;
+  toggleGraphView: () => void;
   startTransition: (to: Vendor) => void;
   updateTransition: (ts: TransitionState) => void;
 }
@@ -33,6 +35,7 @@ export const useBoundStore = create<StoreState>()(
     config: null,
     chapters: [],
     isAudioMuted: true,
+    isGraphViewEnabled: false,
     quality: 'ultra',
     settings: { dpr: 2, particleMultiplier: 1, bloomIntensity: 1, fogEnabled: true, caEnabled: true },
     transition: { phase: 'idle', progress: 0, fromVendor: null, toVendor: null },
@@ -53,6 +56,7 @@ export const useBoundStore = create<StoreState>()(
     },
     clearVendor: () => set({ vendor: null, config: null, chapters: [] }),
     toggleAudio: () => set((s) => ({ isAudioMuted: !s.isAudioMuted })),
+    toggleGraphView: () => set((s) => ({ isGraphViewEnabled: !s.isGraphViewEnabled })),
     startTransition: (to) => {
       const { vendor } = get()
       set({ transition: createTransition(vendor, to) })

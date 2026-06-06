@@ -34,3 +34,7 @@ dist-ssr
 *.cert
 credentials.json
 secrets.*
+
+graphify-out/
+.graphify/
+.graphify_ast.json

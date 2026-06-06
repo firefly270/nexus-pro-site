@@ -1,12 +1,14 @@
 import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { ReactLenis, useLenis } from 'lenis/react';
 import { VendorProvider, useVendor } from './context/VendorContext';
-import { mutateTransientState } from './store/useBoundStore';
+import { mutateTransientState, useBoundStore } from './store/useBoundStore';
+import { useScrollHash } from './hooks/useScrollHash';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './chapters/Hero';
 
 const Scene = lazy(() => import('./3d/Scene'));
+const GraphifyView = lazy(() => import('./components/GraphifyView'));
 
 import OfflineIndicator from './components/OfflineIndicator';
 import AccessibleAnnouncer from './components/AccessibleAnnouncer';
@@ -132,8 +134,10 @@ function useMouseGradient() {
 function AppContent() {
   const { vendor, config } = useVendor();
   const title = config?.heroTitle ?? 'The Silicon Revolution';
+  const isGraphViewEnabled = useBoundStore((s) => s.isGraphViewEnabled);
 
   useMouseGradient();
+  useScrollHash();
 
   const onLenisScroll = useCallback(({ progress }: { progress: number }) => {
     mutateTransientState({ scrollProgress: progress });
@@ -164,36 +168,49 @@ function AppContent() {
   }, []);
 
   return (
-    <ReactLenis root options={{ duration: 1.2, smoothWheel: true }}>
-      <div className="min-h-screen bg-[#030303] text-zinc-100 relative">
-        <div
-          className="fixed inset-0 pointer-events-none -z-[5] opacity-30 transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${config?.color ?? '#76B900'}08, transparent 60%)`,
-          }}
-        />
-        <a href="#main-content" className="skip-to-content">Skip to content</a>
-        <div className="split-root">
-          <div className="split-canvas">
-            <Suspense fallback={null}>
-              <Scene key={vendor ?? 'picker'} />
-            </Suspense>
-          </div>
-          <div className="split-content">
-            <Navbar />
-            <AccessibleAnnouncer />
-            <OfflineIndicator />
-            <main id="main-content" role="main" tabIndex={-1} className="relative z-10 w-full">
-              <div id="scroll-container" className="pb-64 md:pb-96">
-                <Hero />
-                <VendorChapters />
+    <div className="relative">
+      {/* Normal layout */}
+      <div className={`transition-opacity duration-500 ease-in-out ${isGraphViewEnabled ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <ReactLenis root options={{ duration: 1.2, smoothWheel: true }}>
+          <div className="layout-root min-h-screen bg-[#030303] text-zinc-100 relative antialiased">
+            <div
+              className="fixed inset-0 pointer-events-none -z-[5] opacity-30"
+              style={{
+                background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${config?.color ?? '#76B900'}08, transparent 60%)`,
+              }}
+            />
+            <a href="#main-content" className="skip-to-content">Skip to content</a>
+            <div className="split-root">
+              <div className="split-canvas">
+                <Suspense fallback={null}>
+                  <Scene key={vendor ?? 'picker'} />
+                </Suspense>
               </div>
-            </main>
-            <Footer />
+              <div className="split-content">
+                <Navbar />
+                <AccessibleAnnouncer />
+                <OfflineIndicator />
+                <main id="main-content" role="main" tabIndex={-1} className="relative z-10 w-full">
+                  <div id="scroll-container" className="pb-64 md:pb-96">
+                    <Hero />
+                    <VendorChapters />
+                  </div>
+                </main>
+                <Footer />
+              </div>
+            </div>
           </div>
-        </div>
+        </ReactLenis>
       </div>
-    </ReactLenis>
+
+      {/* Graph view overlay */}
+      <div className={`fixed inset-0 z-40 transition-opacity duration-500 ease-in-out ${isGraphViewEnabled ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <Navbar />
+        <Suspense fallback={<div className="fixed inset-0 z-40 bg-[#030303] flex items-center justify-center"><div className="w-6 h-6 border-2 border-zinc-600 border-t-transparent rounded-full animate-spin" /></div>}>
+          <GraphifyView />
+        </Suspense>
+      </div>
+    </div>
   );
 }
 
