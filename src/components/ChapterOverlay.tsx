@@ -15,7 +15,7 @@ export default function ChapterOverlay({ id, children }: ChapterOverlayProps) {
   const color = config?.color ?? '#030303'
 
   return (
-    <section id={id} className="min-h-screen relative flex items-center justify-center py-20 px-6 overflow-hidden">
+    <section id={id} className="min-h-screen relative flex items-center justify-center py-20 md:py-24 px-4 md:px-8 overflow-x-hidden overflow-y-visible">
       <div className="absolute inset-x-0 top-0 h-32 pointer-events-none" style={{ background: `linear-gradient(to bottom, rgba(${hexToRgb(color)},0.06), transparent)` }} />
       <div className="absolute inset-x-0 bottom-0 h-32 pointer-events-none" style={{ background: `linear-gradient(to top, rgba(${hexToRgb(color)},0.06), transparent)` }} />
       <div className="w-full relative">

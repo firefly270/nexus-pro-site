@@ -8,6 +8,7 @@ const isAnalyze = process.argv.some(a => a === 'analyze' || a === '--mode analyz
 
 export default defineConfig({
   base: process.env.GH_PAGES ? '/nexus-pro-site/' : '/',
+  esbuild: { drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : undefined },
   plugins: [
     react(),
     tailwindcss(),
@@ -27,6 +28,7 @@ export default defineConfig({
   build: {
     target: 'es2023',
     cssMinify: 'lightningcss',
+    minify: 'esbuild',
     sourcemap: false,
     modulePreload: { polyfill: false },
     rollupOptions: {

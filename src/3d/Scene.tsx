@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing'
 import { Group, Vector2 } from 'three'
@@ -12,6 +12,18 @@ import CameraSpline from './CameraSpline'
 import FluidSimulation from './FluidSimulation'
 import PortalOverlay from './PortalOverlay'
 import { VendorScene } from './VendorScene'
+
+function useWebGLSupport(): boolean {
+  const [supported, setSupported] = useState(true)
+  useEffect(() => {
+    try {
+      const c = document.createElement('canvas')
+      const gl = c.getContext('webgl2') || c.getContext('webgl')
+      if (!gl) { setSupported(false); return }
+    } catch { setSupported(false) }
+  }, [])
+  return supported
+}
 
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
@@ -83,16 +95,39 @@ function SceneContent() {
   )
 }
 
+function WebGLFallback() {
+  const { config } = useVendor()
+  const color = config?.color ?? '#76B900'
+  const accent = config?.accent ?? '#00D4AA'
+
+  return (
+    <div className="webgl-fallback absolute inset-0" style={{
+      background: `radial-gradient(800px circle at 50% 30%, ${color}10, transparent 60%),
+                  radial-gradient(600px circle at 80% 70%, ${accent}08, transparent 50%),
+                  radial-gradient(400px circle at 20% 80%, ${color}06, transparent 40%)`,
+    }}>
+      <div className="webgl-fallback-nodes" />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-zinc-700 font-mono tracking-wider uppercase">
+        3D unavailable · content still active
+      </div>
+    </div>
+  )
+}
+
 export default function Scene() {
+  const webglOk = useWebGLSupport()
   const isMobile = typeof navigator !== 'undefined' && navigator.hardwareConcurrency < 4
   const dprMax = useBoundStore((s) => isMobile ? 1 : s.settings.dpr)
   const dpr: [number, number] = useMemo(() => [1, dprMax], [dprMax])
+
+  if (!webglOk) return <WebGLFallback />
 
   return (
     <Canvas
       camera={{ position: [0, 0.5, 8], fov: 55, near: 0.1, far: 100 }}
       dpr={dpr}
       gl={{ antialias: !isMobile, powerPreference: isMobile ? 'default' : 'high-performance' }}
+      fallback={<WebGLFallback />}
     >
       <SceneContent />
     </Canvas>

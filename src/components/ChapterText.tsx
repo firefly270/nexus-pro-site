@@ -14,7 +14,7 @@ export default function ChapterText({ label, title, children, align = 'center' }
   const alignClass = align === 'left' ? 'items-start text-left' : align === 'right' ? 'items-end text-right' : 'items-center text-center'
 
   return (
-    <article className={`flex flex-col ${alignClass} space-y-6`}>
+    <article className={`flex flex-col ${alignClass} space-y-6 w-full mx-auto`}>
       <span
         className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs"
         style={{ borderColor: `${color}33`, backgroundColor: `${color}0D`, color }}
@@ -46,7 +46,7 @@ export default function ChapterText({ label, title, children, align = 'center' }
           )}
         </span>
       </h2>
-      <div className="text-[var(--type-scale-body)] text-zinc-400 leading-relaxed space-y-4 prose-column">
+      <div className="text-[var(--type-scale-body)] text-zinc-400 leading-relaxed space-y-4 prose-column px-2 md:px-4">
         {children}
       </div>
     </article>

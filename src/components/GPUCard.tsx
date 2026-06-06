@@ -39,18 +39,18 @@ function getEnvironmentalSpecs(props: GPUCardData | CPUCardData) {
 
 function Spec({ label, val, large }: { label: string; val: string; large?: boolean }) {
   return (
-    <div className="rounded-lg px-3 py-2 transition-all duration-200 hover:-translate-y-0.5" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-zinc-500 text-[10px] uppercase tracking-wider">{label}</div>
-      <div className={`text-white ${large ? 'text-2xl' : 'text-sm'} font-mono`}>{val}</div>
+    <div className="rounded-lg px-4 py-2.5 transition-all duration-200 hover:-translate-y-0.5 w-full" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">{label}</div>
+      <div className={`text-white ${large ? 'text-2xl' : 'text-sm'} font-mono leading-tight`}>{val}</div>
     </div>
   )
 }
 
 function MiniSpec({ label, val }: { label: string; val: string }) {
   return (
-    <div className="rounded-md px-2 py-1" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-zinc-500 text-[9px] uppercase tracking-wider">{label}</div>
-      <div className="text-white text-xs font-mono">{val}</div>
+    <div className="rounded-md px-3 py-1.5 w-full" style={{ background: 'rgba(0,0,0,0.35)', border: '0.5px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-zinc-500 text-[9px] uppercase tracking-wider mb-0.5">{label}</div>
+      <div className="text-white text-xs font-mono leading-tight">{val}</div>
     </div>
   )
 }
@@ -104,7 +104,9 @@ export default function GPUCard(props: CardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative backdrop-blur-xl animate-fade-up transition-transform duration-300 ease-out overflow-hidden`}
+      role="article"
+      aria-label={`Specifications for ${name}`}
+      className={`relative backdrop-blur-xl animate-fade-up overflow-hidden w-full card-hover`}
       style={{
         border: 'var(--era-border, 1px solid rgba(255,255,255,0.05))',
         background: 'rgba(255, 255, 255, 0.03)',
@@ -157,14 +159,14 @@ export default function GPUCard(props: CardProps) {
 
           <p className="text-zinc-300 text-sm italic border-l-2 pl-3 mb-5" style={{ borderColor: `${color}66` }}>{highlight}</p>
 
-          {/* Asymmetric bento grid: 5 columns */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-4">
-            <div className="space-y-2 md:col-span-3">
+          {/* Two-column metric grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div className="space-y-2">
               {primarySpecs.map(s => (
                 <Spec key={s.label} label={s.label} val={s.val} large={s.large} />
               ))}
             </div>
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
               {envSpecs.map(s => (
                 <Spec key={s.label} label={s.label} val={s.val} />
               ))}

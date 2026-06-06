@@ -123,6 +123,11 @@
   }
 }
 
+.layout-root {
+  overflow-x: hidden;
+  position: relative;
+}
+
 .split-root {
   display: block;
   min-height: 100vh;
@@ -136,7 +141,7 @@
 @media (min-width: 1024px) {
   .split-root {
     display: grid;
-    grid-template-columns: 60fr 40fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -145,6 +150,18 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
+  will-change: transform;
+}
+@media (max-width: 767px) {
+  .split-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40vh;
+    bottom: auto;
+  }
 }
 @media (min-width: 768px) {
   .split-canvas {
@@ -152,6 +169,7 @@
     top: 0;
     height: 100vh;
     width: 100%;
+    min-width: 0;
   }
 }
 
@@ -159,19 +177,23 @@
   position: relative;
   z-index: 1;
   width: 100%;
+  max-width: 100%;
+  content-visibility: auto;
+  contain-intrinsic-size: 100vh;
 }
 @media (min-width: 768px) {
   .split-content {
     min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 
 html { overscroll-behavior: none; }
 
 /* Hide Lenis scroll progress indicator */
-html.lenis, html.lenis body { overscroll-behavior: none; scrollbar-width: none; }
+html.lenis, html.lenis body { overscroll-behavior: none; }
 .lenis.lenis-scrolling > * { scrollbar-width: none; }
-::-webkit-scrollbar { display: none; }
 html.lenis-progress-bar,
 .lenis-progress-bar,
 [data-lenis-progress],
@@ -181,7 +203,38 @@ html.lenis-progress-bar,
   height: 0 !important;
   pointer-events: none !important;
 }
+
+/* Premium custom scrollbar for split-content (desktop right column) */
+.split-content::-webkit-scrollbar {
+  width: 6px;
+}
+.split-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.split-content::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+.split-content::-webkit-scrollbar-thumb:hover {
+  background: #00ff66;
+}
+.split-content {
+  scrollbar-width: thin;
+  scrollbar-color: #222 transparent;
+}
+@media (hover: hover) {
+  .split-content:hover {
+    scrollbar-color: #00ff66 transparent;
+  }
+}
 body { margin: 0; min-height: 100vh; -webkit-font-smoothing: antialiased; background: #030303; color-scheme: dark; }
+
+/* Skip rendering off-screen chapter content */
+section[id^="ch-"] {
+  content-visibility: auto;
+  contain-intrinsic-size: 100vh;
+}
 body::after {
   content: '';
   position: fixed;
@@ -198,6 +251,23 @@ body::after {
   outline: 2px solid var(--vendor-accent, var(--vendor-color, #76B900));
   outline-offset: 4px;
 }
+.prose-column {
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card-max-w {
+  width: 100%;
+  max-width: 36rem;
+}
+
+@media (max-width: 767px) {
+  .prose-column {
+    max-width: 100%;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -224,12 +294,13 @@ body::after {
 .capsule-tag {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 2px 6px;
   font-size: 9px;
   font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', monospace;
   border-radius: 999px;
   white-space: nowrap;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .segment-block {
@@ -242,6 +313,57 @@ body::after {
   transition-duration: 0s;
 }
 
+/* GPU card hover micro-interaction */
+.card-hover {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card-hover:hover {
+  border-color: rgba(0, 255, 102, 0.3) !important;
+  box-shadow: 0 0 24px rgba(0, 255, 102, 0.08), 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: scale(1.01);
+}
+.card-hover:focus-visible {
+  border-color: rgba(0, 255, 102, 0.5) !important;
+  box-shadow: 0 0 32px rgba(0, 255, 102, 0.12), 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: scale(1.01);
+}
+
 @media (max-width: 767px) {
-  .capsule-tag { font-size: 8px; padding: 0 4px; }
+  .capsule-tag { font-size: 8px; padding: 1px 4px; }
+}
+
+/* WebGL fallback — animated gradient when 3D unavailable */
+.webgl-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: wf-pulse 6s ease-in-out infinite alternate;
+}
+@keyframes wf-pulse {
+  0% { opacity: 0.85; }
+  100% { opacity: 1; }
+}
+.webgl-fallback-nodes {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 10%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 30%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 60% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 50% 60%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 85%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 50%, rgba(255,255,255,0.15) 0%, transparent 100%);
+  background-size: 120px 120px;
+  animation: wf-drift 20s linear infinite;
+}
+@keyframes wf-drift {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-60px); }
 }
