@@ -38,3 +38,7 @@ secrets.*
 graphify-out/
 .graphify/
 .graphify_ast.json
+
+# Open Design local cache and state
+.od/
+opendesign/
